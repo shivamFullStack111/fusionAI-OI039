@@ -1,0 +1,10 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://ai-agent-saas-s1ie.onrender.com/api/:path*"
+    }, 
+{ "source": "/(.*)", "destination": "/index.html" }
+
+  ]
+}
