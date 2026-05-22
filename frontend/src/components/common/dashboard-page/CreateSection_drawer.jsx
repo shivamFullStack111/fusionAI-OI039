@@ -133,7 +133,7 @@ function CreateSection_drawer({ allSection, setallSections }) {
         toast.success(res?.data?.message);
         setallSections((prev) => [res?.data?.section, ...prev]);
       } else {
-        // toast.error(res?.data?.message);
+        toast.error(res?.data?.message);
       }
     } catch (error) {
       toast.error(error.message);

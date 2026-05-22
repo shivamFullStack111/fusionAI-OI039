@@ -153,7 +153,9 @@ const DangerZone = () => {
 const LogOut = ({ navigate }) => {
   const handleLogOut = async () => {
     try {
-      const res = await axios.get(DB_URL + "/user/logout");
+      const res = await axios.get(DB_URL + "/user/logout",{
+        withCredentials:true
+      });
 
       if (res?.data?.success) {
         toast.success(res?.data?.message);

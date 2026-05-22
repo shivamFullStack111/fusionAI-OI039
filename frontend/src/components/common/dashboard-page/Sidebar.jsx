@@ -10,6 +10,11 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 const Sidebar = () => {
+  // get current path 
+  const currentPath = window.location.pathname;
+
+  console.log(currentPath)
+
   return (
     <div className="h-full overflow-y-auto  flex flex-col border-r w-70">
       <Link to={"/"} className="flex gap-2  items-center  p-3 border-b">
@@ -24,7 +29,7 @@ const Sidebar = () => {
       <div className="p-5 flex mt-6 flex-col gap-2">
         <Link
           to={"/dashboard"}
-          className="flex items-center text-zinc-500 hover:text-zinc-300 cursor-pointer p-2 rounded-lg hover:bg-zinc-950 gap-3"
+          className={`flex items-center   cursor-pointer p-2 rounded-lg hover:bg-zinc-950 gap-3 ${currentPath === "/dashboard" ? "bg-zinc-950 text-blue-500" : "text-zinc-500 hover:text-zinc-300"}`}
         >
           <LayoutDashboard size={20} />
           <p className="text-sm ">Dashboard</p>
@@ -32,7 +37,7 @@ const Sidebar = () => {
 
         <Link
           to={"/dashboard/knowledge"}
-          className="flex items-center text-zinc-500 hover:text-zinc-300 cursor-pointer p-2 rounded-lg hover:bg-zinc-950 gap-3"
+          className={`flex items-center   cursor-pointer p-2 rounded-lg hover:bg-zinc-950 gap-3 ${currentPath === "/dashboard/knowledge" ? "bg-zinc-950 text-blue-500" : "text-zinc-500 hover:text-zinc-300"}`}
         >
           <BookOpen size={20} />
           <p className="text-sm ">Knowledge</p>
@@ -40,7 +45,7 @@ const Sidebar = () => {
 
         <Link
           to={"/dashboard/sections"}
-          className="flex items-center text-zinc-500 hover:text-zinc-300 cursor-pointer p-2 rounded-lg hover:bg-zinc-950 gap-3"
+          className={`flex items-center   cursor-pointer p-2 rounded-lg hover:bg-zinc-950 gap-3 ${currentPath === "/dashboard/sections" ? "bg-zinc-950 text-blue-500" : "text-zinc-500 hover:text-zinc-300"}`}
         >
           <Layers size={20} />
           <p className="text-sm ">Sections</p>
@@ -48,7 +53,7 @@ const Sidebar = () => {
 
         <Link
           to={"/dashboard/chatbot"}
-          className="flex items-center text-zinc-500 hover:text-zinc-300 cursor-pointer p-2 rounded-lg hover:bg-zinc-950 gap-3"
+          className={`flex items-center   cursor-pointer p-2 rounded-lg hover:bg-zinc-950 gap-3 ${currentPath === "/dashboard/chatbot" ? "bg-zinc-950 text-blue-500" : "text-zinc-500 hover:text-zinc-300"}`}
         >
           <Bot size={20} />
           <p className="text-sm ">Chatbot</p>
@@ -56,7 +61,7 @@ const Sidebar = () => {
 
         <Link
           to={"/dashboard/conversations"}
-          className="flex items-center text-zinc-500 hover:text-zinc-300 cursor-pointer p-2 rounded-lg hover:bg-zinc-950 gap-3"
+          className={`flex items-center   cursor-pointer p-2 rounded-lg hover:bg-zinc-950 gap-3 ${currentPath === "/dashboard/conversations" ? "bg-zinc-950 text-blue-500" : "text-zinc-500 hover:text-zinc-300"}`}
         >
           <MessageCircle size={20} />
           <p className="text-sm ">Conversations</p>
@@ -64,7 +69,7 @@ const Sidebar = () => {
 
         <Link
           to={"/dashboard/settings"}
-          className="flex items-center text-zinc-500 hover:text-zinc-300 cursor-pointer p-2 rounded-lg hover:bg-zinc-950 gap-3"
+          className={`flex items-center   cursor-pointer p-2 rounded-lg hover:bg-zinc-950 gap-3 ${currentPath === "/dashboard/settings" ? "bg-zinc-950 text-blue-500" : "text-zinc-500 hover:text-zinc-300"}`}
         >
           <Settings size={20} />
           <p className="text-sm ">Settings</p>
