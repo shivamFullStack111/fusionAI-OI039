@@ -20,6 +20,7 @@ import { SkeletonList } from "./KnowledgePage.jsx";
 const SectionPage = () => {
   const [allSections, setallSections] = useState([]);
   const [viewDrawerOpen, setviewDrawerOpen] = useState(null); // ✅ null/id based
+  const [isLoadingSections, setisLoadingSections] = useState(true);
 
   useEffect(() => {
     const getAllSections = async () => {
@@ -35,6 +36,8 @@ const SectionPage = () => {
         }
       } catch (error) {
         toast.error(error.message);
+      } finally {
+        setisLoadingSections(false);
       }
     };
     getAllSections();
@@ -122,7 +125,19 @@ const SectionPage = () => {
                 </TableRow>
               </TableBody>
             ))}
-            {!allSections?.length && <SkeletonList totalCell={7} />}
+            {isLoadingSections && <SkeletonList totalCell={7} />}
+
+            {!isLoadingSections && allSections?.length === 0 && (
+              <TableBody >
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-10">
+                    <div className="text-zinc-500">
+                      No sections found. Create a new one.
+                    </div>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            )}
           </Table>
         </div>
       </div>

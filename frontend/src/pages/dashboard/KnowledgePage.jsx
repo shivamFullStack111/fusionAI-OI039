@@ -302,6 +302,16 @@ const KnowledgeTableList = ({
             })}
         </TableBody>
 
+        {!loading && allKnowledges?.length === 0 && (
+          <TableBody>
+            <TableRow>
+              <TableCell colSpan={5} className="text-center py-10">
+                <div className="text-zinc-500">No knowledge found. Add a new one.</div>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        )}
+
         {loading && <SkeletonList />}
       </Table>
     </div>
