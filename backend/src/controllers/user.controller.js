@@ -56,7 +56,7 @@ export const register = async (req, res) => {
     await newUser.save();
 
     const accessToken = jwt.sign({ _id: newUser?._id }, ACCESS_TOKEN_SECRET, {
-      expiresIn: "7d",
+      expiresIn: "15m",
     });
 
     const refreshToken = jwt.sign({ _id: newUser?._id }, REFRESH_TOKEN_SECRET, {
@@ -110,19 +110,15 @@ export const login = async (req, res) => {
       });
 
     const accessToken = jwt.sign({ _id: user?._id }, ACCESS_TOKEN_SECRET, {
-      expiresIn: "7d",
+      expiresIn: "15m",
     });
 
     const refreshToken = jwt.sign({ _id: user?._id }, REFRESH_TOKEN_SECRET, {
       expiresIn: "7d",
     });
 
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      sameSite: "lax",
-      path: "/", // 🔥 add this
-    });
-
+    setRefreshTokenCookies(res, refreshToken);
+    
     return res.send({
       success: true,
       message: "Login success",
@@ -168,7 +164,7 @@ export const refreshToken = async (req, res) => {
     }
 
     const accessToken = jwt.sign({ _id: user?._id }, ACCESS_TOKEN_SECRET, {
-      expiresIn: "7d",
+      expiresIn: "15m",
     });
 
     return res.send({ success: true, message: "token refreshed", accessToken });

@@ -75,12 +75,12 @@ const App = () => {
 
       if (res.data.success) {
         dispatch(setAccessToken(res?.data?.accessToken));
-        const expire_minutes_30 = new Date(
-          new Date().getTime() + 30 * 60 * 1000,
+        const expire_minutes_15 = new Date(
+          new Date().getTime() + 15 * 60 * 1000,
         );
 
         Cookies.set("accessToken", res?.data?.accessToken, {
-          expires: expire_minutes_30,
+          expires: expire_minutes_15,
         });
 
         return await checkAuth(true);

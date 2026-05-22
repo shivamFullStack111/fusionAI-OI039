@@ -74,17 +74,19 @@ const SignIn_SignUp = ({ buttonClassName, buttonTitle, type = "signin" }) => {
         };
       }
 
-      const res = await axios.post(apiURL, payload);
+      const res = await axios.post(apiURL, payload,{
+        withCredentials: true,
+      });
 
       if (res.data?.success) {
         toast.success(res.data.message);
 
-        const expire_minutes_30 = new Date(
-          new Date().getTime() + 30 * 60 * 1000,
+        const expire_minutes_15 = new Date(
+          new Date().getTime() + 15 * 60 * 1000,
         );
 
         Cookies.set("accessToken", res?.data?.accessToken, {
-          expires: expire_minutes_30,
+          expires: expire_minutes_15,
         });
 
         localStorage.setItem("user", JSON.stringify(res.data?.user));
