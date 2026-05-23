@@ -8,12 +8,17 @@ import {
   ThumbsUp,
   Star,
   Check,
+  LineSquiggle,
+  MessagesSquare,
+  PanelRightClose,
+  SquarePen,
 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { DB_URL } from "../../../utils/variables.js";
 import Loader from "../common/Loader";
 import toast from "react-hot-toast";
+import { motion } from "framer-motion";
 
 const ChatbotUI = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,6 +31,8 @@ const ChatbotUI = () => {
   const [conversation, setConversation] = useState(null);
   const [allMessages, setAllMessages] = useState([]);
   const [userCurrentPlan, setuserCurrentPlan] = useState(null);
+
+  const [conversationSidebarOpen, setconversationSidebarOpen] = useState(false);
 
   useEffect(() => {
     const chatbotId = params.get("bot_id");
@@ -138,6 +145,8 @@ const ChatbotUI = () => {
           )}
           {!loading && !error && (
             <ChatWindow
+              conversationSidebarOpen={conversationSidebarOpen}
+              setconversationSidebarOpen={setconversationSidebarOpen}
               conversation={conversation}
               setConversation={setConversation}
               chatbot={chatbot}
@@ -216,6 +225,8 @@ const ChatWindow = ({
   primaryColor,
   conversation,
   setConversation,
+  setconversationSidebarOpen,
+  conversationSidebarOpen,
 }) => {
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
@@ -235,11 +246,70 @@ const ChatWindow = ({
   };
 
   return (
-    <div className="h-[600px] w-full bg-[#0f0f13] rounded-2xl overflow-hidden border border-white/10 shadow-2xl flex flex-col">
+    <div className="h-150 relative w-full bg-[#0f0f13] rounded-2xl overflow-hidden border border-white/10 shadow-2xl flex flex-col">
       {/* Header */}
+
+      {/* conversation sidebar of user */}
+      <motion.div
+        initial={{ x: -300, opacity: 0 }}
+        animate={{
+          x: conversationSidebarOpen ? 0 : -300,
+          opacity: conversationSidebarOpen ? 1 : 0,
+        }}
+        transition={{ duration: 0.3 }}
+        className="w-80 top-0 left-0  h-full bg-[#0f0f13b3] backdrop-blur-sm  absolute z-50"
+      >
+        {/* close buttoon  */}
+        <div
+          onClick={() => {
+            setconversationSidebarOpen(false);
+          }}
+          className="p-3  flex justify-end border-b border-white/10 "
+        >
+          <PanelRightClose className=" text-gray-400 hover:text-white cursor-pointer  " />
+        </div>
+
+        <div className="p-3">
+          <div className="p-3 bg-black/20 hover:bg-black/40 rounded-lg cursor-pointer  ">
+            <div className=" flex gap-3 items-center ">
+              <SquarePen size={20} />
+              <h2 className="text-[12px]">New Chat</h2>
+            </div>
+          </div>
+        </div>
+
+        <p className="border-b h-1"></p>
+        <div className="p-3">
+          <h2 className="text-sm font-semibold   text-gray-400">
+            Conversations
+          </h2>
+         <div className="flex mt-3 flex-col">
+           {Array.from({ length: 5 }).map((_, i) => (
+            <div
+              key={i}
+              className="p-3 hover:bg-black/40 rounded-lg cursor-pointer  "
+            >
+              <div className=" flex  gap-3 items-center ">
+                <h2 className="text-[12px]">Conversation {i + 1}</h2>
+              </div>
+            </div>
+          ))}
+         </div>
+        </div>
+      </motion.div>
+
       <div className="relative p-4 border-b border-white/10 bg-linear-to-br from-[#1a1a1f] to-[#0f0f13]">
         <div className="flex items-center gap-3">
           {/* Avatar */}
+          <div
+            onClick={() => {
+              setconversationSidebarOpen(true);
+            }}
+            className="w-10 h-10 text-gray-400 hover:text-white cursor-pointer rounded-full flex items-center justify-center overflow-hidden"
+            style={{ backgroundColor: `${primaryColor}20` }}
+          >
+            <MessagesSquare size={20} />
+          </div>
           <div
             className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden"
             style={{ backgroundColor: `${primaryColor}20` }}
