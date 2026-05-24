@@ -51,6 +51,8 @@ export const sendMessage = async (req, res) => {
     }
 
     // creating conversation on userFirst message if conversationId not provided in req.body
+    let isNewConversation = false;
+
     if (!req.body.conversationId) {
       const userIP = req.ip || "";
 
@@ -60,8 +62,9 @@ export const sendMessage = async (req, res) => {
         chatbotId: req.body.chatbotId,
         externaluserId: idToFind,
       });
-      
+
       await newConversation.save();
+      isNewConversation = true;
       req.body.conversationId = newConversation._id;
     }
 
@@ -204,6 +207,7 @@ export const sendMessage = async (req, res) => {
       humanMessage: newMessageUser,
       aiMessage: newMessageAi,
       conversation,
+      isNewConversation,
     });
   } catch (error) {
     return res.send({ success: false, message: error.message });

@@ -8,7 +8,7 @@ import {
 import { authMiddleware } from "../middleware/auth.middleware.js";
 import { isSubscribed } from "../middleware/isSubscribed.middleware.js";
 import { upload } from "../middleware/multer.middleware.js";
-import { getAllConversations, submitReview } from "../controllers/conversation.controller.js";
+import { getAllConversations, getUserAllConversations, submitReview } from "../controllers/conversation.controller.js";
 
 const conversationRoutes = express.Router();
 
@@ -18,5 +18,6 @@ conversationRoutes.post(
   getAllConversations,
 );
 conversationRoutes.post("/submit-review", authMiddleware, submitReview);
+conversationRoutes.post("/get-user-all-conversations", getUserAllConversations);
 
 export default conversationRoutes;

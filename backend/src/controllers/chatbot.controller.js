@@ -57,17 +57,17 @@ export const getChatbotAndRequiredData = async (req, res, next) => {
         _id: req?.body?.conversationId,
       })) || null;
 
-    let allMessages = [];
+    // let allMessages = [];
 
-    allMessages.push({
-      role: "ai",
-      content: chatbot?.welcomeMessage,
-    });
+    // allMessages.push({
+    //   role: "ai",
+    //   content: chatbot?.welcomeMessage,
+    // });
 
-    const messages = await Message.find({
-      conversationId: conversation?._id,
-    });
-    allMessages = [...allMessages, ...messages];
+    // const messages = await Message.find({
+    //   conversationId: conversation?._id,
+    // });
+    // allMessages = [...allMessages, ...messages];
 
     return res.send({
       success: true,
@@ -76,7 +76,7 @@ export const getChatbotAndRequiredData = async (req, res, next) => {
       sections,
       user,
       conversation,
-      allMessages,
+      // allMessages,
       userCurrentPlan,
     });
   } catch (error) {
