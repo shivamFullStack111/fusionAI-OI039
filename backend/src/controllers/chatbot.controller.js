@@ -52,19 +52,15 @@ export const getChatbotAndRequiredData = async (req, res, next) => {
     if (!sections?.length)
       return res.send({ success: false, message: " sections not found" });
 
-    // ============================================================================
-    // ------------ FINDING CONVERSATION IF NOT EXIST CREATE NEW ------------------
-    // ============================================================================
-    const external_userId = req?.body?.external_userId || "";
-    const userIP = req.ip || "";
+    if (!req?.body?.conversationId) {
+      return res.send({
+        success: false,
+        message: "Conversation id is required",
+      });
+    }
 
-    const idToFind = external_userId || userIP;
-
-    let conversation = null;
-
-    conversation = await Conversation.findOne({
-      externaluserId: idToFind,
-      chatbotId: req?.body?.chatbotId,
+    const conversation = await Conversation.findOne({
+      _id: req?.body?.conversationId,
     });
 
     let allMessages = [];
@@ -74,22 +70,10 @@ export const getChatbotAndRequiredData = async (req, res, next) => {
       content: chatbot?.welcomeMessage,
     });
 
-    if (conversation) {
-      const messages = await Message.find({
-        conversationId: conversation?._id,
-      });
-      allMessages = [...allMessages, ...messages];
-    }
-
-    if (!conversation) {
-      console.log("first");
-      conversation = new Conversation({
-        externaluserId: external_userId || userIP,
-        chatbotId: req?.body?.chatbotId,
-      });
-
-      await conversation.save();
-    }
+    const messages = await Message.find({
+      conversationId: conversation?._id,
+    });
+    allMessages = [...allMessages, ...messages];
 
     return res.send({
       success: true,

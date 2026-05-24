@@ -15,11 +15,7 @@ export const sendMessage = async (req, res) => {
   try {
     if (!req.body.userId)
       return res.send({ success: false, message: "User id is required" });
-    if (!req.body.conversationId)
-      return res.send({
-        success: false,
-        message: "Conversation id is required",
-      });
+
     if (!req.body.chatbotId)
       return res.send({ success: false, message: "Chatbot id is required" });
 
@@ -52,6 +48,20 @@ export const sendMessage = async (req, res) => {
         success: false,
         message: "Message Limit reached you have to re-purchase plan ",
       });
+    }
+
+    // creating conversation on userFirst message if conversationId not provided in req.body
+    if (!req.body.conversationId) {
+      const userIP = req.ip || "";
+
+      const idToFind = req?.body?.external_userId || userIP;
+
+      const newConversation = new Conversation({
+        chatbot: req.body.chatbotId,
+        externaluserId: idToFind,
+      });
+      await newConversation.save();
+      req.body.conversationId = newConversation._id;
     }
 
     const last8Message = req?.body?.allMessages?.slice(-8);
@@ -156,6 +166,8 @@ export const sendMessage = async (req, res) => {
       content: content,
     });
 
+    const conversation = await Conversation.findById(req?.body?.conversationId);
+
     if (content == "Conversation Ended") {
       await Conversation.findOneAndUpdate(
         {
@@ -190,6 +202,7 @@ export const sendMessage = async (req, res) => {
       message: "Response generated",
       humanMessage: newMessageUser,
       aiMessage: newMessageAi,
+      conversation,
     });
   } catch (error) {
     return res.send({ success: false, message: error.message });
