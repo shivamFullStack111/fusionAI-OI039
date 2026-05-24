@@ -90,7 +90,7 @@ const Chatbot = () => {
           </div>
           <div className="w-[40%] h-min ">
             <Apperance_Box
-              loading={loading}c
+              loading={loading}
               setloading={setloading}
               handleUpdate={handleUpdate}
               primaryColor={primaryColor}
