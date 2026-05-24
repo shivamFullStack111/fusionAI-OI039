@@ -3,13 +3,35 @@ import { Conversation } from "../schemas/conversation.schema.js";
 
 export const getAllConversations = async (req, res) => {
   try {
-    const chatbot = await Chatbot.findOne({userId:req?.user?._id});
+    const chatbot = await Chatbot.findOne({ userId: req?.user?._id });
     console.log(chatbot);
     if (!chatbot) {
       return res.send({ success: false, message: "Chatbot not found" });
     }
     const conversations = await Conversation.find({
       chatbot: req?.chatbot?._id,
+    }).sort({ updatedAt: -1 });
+    return res.send({
+      success: true,
+      allConversations: conversations,
+    });
+  } catch (error) {
+    return res.send({ success: false, message: error.message });
+  }
+};
+
+export const getUserAllConversations = async (req, res) => {
+  try {
+    const { chatbotId, currentUserId } = req.body;
+    if (!chatbotId) {
+      return res.send({ success: false, message: "Chatbot ID is required" });
+    }
+
+    const userIp = req.ip || "";
+
+    const conversations = await Conversation.find({
+      chatbotId,
+      externaluserId: currentUserId || userIp,
     }).sort({ updatedAt: -1 });
     return res.send({
       success: true,
