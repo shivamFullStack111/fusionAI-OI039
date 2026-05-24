@@ -207,7 +207,7 @@ const Conversations = () => {
         setLoadingMessages(true);
         const accessToken = Cookies.get("accessToken");
         const res = await axios.post(
-          DB_URL + "/message/get-all-messages",
+          DB_URL + "/message/get-all-messages-of-conversation",
           { conversationId: selectedConversation._id },
           { headers: { Authorization: accessToken } }
         );

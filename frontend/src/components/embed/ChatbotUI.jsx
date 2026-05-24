@@ -32,7 +32,11 @@ const ChatbotUI = () => {
   const [allMessages, setAllMessages] = useState([]);
   const [userCurrentPlan, setuserCurrentPlan] = useState(null);
 
+  const [currentConversationId, setcurrentConversationId] = useState("");
+
   const [conversationSidebarOpen, setconversationSidebarOpen] = useState(false);
+
+  const [userAllConversations, setuserAllConversations] = useState([]);
 
   useEffect(() => {
     const chatbotId = params.get("bot_id");
@@ -62,7 +66,16 @@ const ChatbotUI = () => {
           setChatbot(res.data.chatbot);
           setSections(res.data.sections);
           setConversation(res.data.conversation);
-          setAllMessages(res.data.allMessages);
+          setcurrentConversationId(res?.data.conversation?._id || "");
+
+          setAllMessages([
+            {
+              role: "ai",
+              content:
+                res.data.chatbot?.welcomeMessage ||
+                "Hi there! How can I assist you today?",
+            },
+          ]);
         } else {
           setError({
             title: "Error fetching data",
@@ -92,7 +105,11 @@ const ChatbotUI = () => {
     setIsOpen(false);
   };
 
+  // send message
   const handleSend = async (text) => {
+    const chatbotId = params.get("bot_id");
+    const external_userId = params.get("user_id");
+
     const userMessage = { role: "user", content: text };
     setAllMessages((prev) => [...prev, userMessage]);
     setIsTyping(true);
@@ -105,14 +122,31 @@ const ChatbotUI = () => {
         sections,
         allMessages,
         userId: chatbot?.userId,
+
+        // for create conversation on first message if not exist
+        external_userId: external_userId,
+        chatbotId: chatbotId,
       });
 
       if (res.data?.success) {
+        if (res?.data?.isNewConversation) {
+          setuserAllConversations((prev) => [
+            {
+              _id: res.data?.conversation?._id,
+              chatbotId: chatbotId,
+              externaluserId: external_userId,
+            },
+            ...prev,
+          ]);
+        }
         const aiMessage = { role: "ai", content: res.data.aiMessage?.content };
         setAllMessages((prev) => [...prev, aiMessage]);
         if (res?.data?.aiMessage?.content == "Conversation Ended") {
           setConversation((p) => ({ ...p, isEnded: true }));
         }
+
+        setConversation(res.data.conversation);
+        setcurrentConversationId(res.data.conversation?._id);
       } else {
         toast.error(res?.data?.message);
       }
@@ -146,15 +180,20 @@ const ChatbotUI = () => {
           {!loading && !error && (
             <ChatWindow
               conversationSidebarOpen={conversationSidebarOpen}
+              setcurrentConversationId={setcurrentConversationId}
               setconversationSidebarOpen={setconversationSidebarOpen}
               conversation={conversation}
               setConversation={setConversation}
               chatbot={chatbot}
               messages={allMessages}
+              setmessages={setAllMessages}
               isTyping={isTyping}
               onSend={handleSend}
               onClose={handleClose}
               primaryColor={primaryColor}
+              currentConversationId={currentConversationId}
+              userAllConversations={userAllConversations}
+              setuserAllConversations={setuserAllConversations}
             />
           )}
         </div>
@@ -219,6 +258,7 @@ const ErrorState = ({ error, onClose }) => (
 const ChatWindow = ({
   chatbot,
   messages,
+  setmessages,
   isTyping,
   onSend,
   onClose,
@@ -227,6 +267,11 @@ const ChatWindow = ({
   setConversation,
   setconversationSidebarOpen,
   conversationSidebarOpen,
+  currentConversationId,
+  setcurrentConversationId,
+
+  userAllConversations,
+  setuserAllConversations,
 }) => {
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
@@ -249,54 +294,19 @@ const ChatWindow = ({
     <div className="h-150 relative w-full bg-[#0f0f13] rounded-2xl overflow-hidden border border-white/10 shadow-2xl flex flex-col">
       {/* Header */}
 
-      {/* conversation sidebar of user */}
-      <motion.div
-        initial={{ x: -300, opacity: 0 }}
-        animate={{
-          x: conversationSidebarOpen ? 0 : -300,
-          opacity: conversationSidebarOpen ? 1 : 0,
-        }}
-        transition={{ duration: 0.3 }}
-        className="w-80 top-0 left-0  h-full bg-[#0f0f13b3] backdrop-blur-sm  absolute z-50"
-      >
-        {/* close buttoon  */}
-        <div
-          onClick={() => {
-            setconversationSidebarOpen(false);
-          }}
-          className="p-3  flex justify-end border-b border-white/10 "
-        >
-          <PanelRightClose className=" text-gray-400 hover:text-white cursor-pointer  " />
-        </div>
-
-        <div className="p-3">
-          <div className="p-3 bg-black/20 hover:bg-black/40 rounded-lg cursor-pointer  ">
-            <div className=" flex gap-3 items-center ">
-              <SquarePen size={20} />
-              <h2 className="text-[12px]">New Chat</h2>
-            </div>
-          </div>
-        </div>
-
-        <p className="border-b h-1"></p>
-        <div className="p-3">
-          <h2 className="text-sm font-semibold   text-gray-400">
-            Conversations
-          </h2>
-         <div className="flex mt-3 flex-col">
-           {Array.from({ length: 5 }).map((_, i) => (
-            <div
-              key={i}
-              className="p-3 hover:bg-black/40 rounded-lg cursor-pointer  "
-            >
-              <div className=" flex  gap-3 items-center ">
-                <h2 className="text-[12px]">Conversation {i + 1}</h2>
-              </div>
-            </div>
-          ))}
-         </div>
-        </div>
-      </motion.div>
+      {/* sidebar of user conversations   */}
+      <SidebarOfUserConversations
+        currentConversationId={currentConversationId}
+        setcurrentConversationId={setcurrentConversationId}
+        conversationSidebarOpen={conversationSidebarOpen}
+        setconversationSidebarOpen={setconversationSidebarOpen}
+        chatbot={chatbot}
+        setConversation={setConversation}
+        allMessages={messages}
+        setAllMessages={setmessages}
+        userAllConversations={userAllConversations}
+        setuserAllConversations={setuserAllConversations}
+      />
 
       <div className="relative p-4 border-b border-white/10 bg-linear-to-br from-[#1a1a1f] to-[#0f0f13]">
         <div className="flex items-center gap-3">
@@ -348,7 +358,7 @@ const ChatWindow = ({
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10">
-        {messages.length === 0 && (
+        {messages && messages?.length === 0 && (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <Bot
@@ -360,28 +370,17 @@ const ChatWindow = ({
             </div>
           </div>
         )}
-        {messages.map((msg, idx) => (
-          <MessageBubble
-            setConversation={setConversation}
-            message={msg}
-            isVisible={visibleMessages.has(idx)}
-            primaryColor={primaryColor}
-            conversation={conversation}
-          />
-          //   conversation={conversation}
-          //   key={idx}
-          //   message={msg}
-          //   isVisible={visibleMessages.has(idx)}
-          //   primaryColor={primaryColor}
-          // />
-        ))}
-        {/* {conversation?.isEnded == true && (
-          <div className="flex w-full justify-center p-3">
-            {Array.from({length:5}).map(i=>{
-              return <StarFi
-            })}
-          </div>
-        )} */}
+        {messages &&
+          messages?.map((msg, idx) => (
+            <MessageBubble
+              setConversation={setConversation}
+              message={msg}
+              isVisible={visibleMessages.has(idx)}
+              primaryColor={primaryColor}
+              conversation={conversation}
+            />
+          ))}
+
         {isTyping && <TypingIndicator primaryColor={primaryColor} />}
         <div ref={messagesEndRef} />
       </div>
@@ -441,50 +440,146 @@ const ChatWindow = ({
   );
 };
 
-//  Message Bubble
-// const MessageBubble = ({ message, isVisible, primaryColor, conversation }) => {
-//   const isAi = message.role === "ai";
-//   const text = message.content;
-//   const isConversationEnded = text == "Conversation Ended";
+const SidebarOfUserConversations = ({
+  setconversationSidebarOpen,
+  setConversation,
+  setcurrentConversationId,
+  conversationSidebarOpen,
+  currentConversationId,
+  chatbot,
+  allMessages,
+  setAllMessages,
+  userAllConversations,
+  setuserAllConversations,
+}) => {
+  const [params] = useSearchParams();
+  const [external_userId, setexternal_userId] = useState("");
 
-//   return (
-//     <div
-//       className={`flex gap-2.5 ${isAi ? "justify-start" : "justify-end"} transition-all duration-300 ${
-//         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
-//       }`}
-//     >
-//       {isConversationEnded && <>hii</>}
-//       {!isConversationEnded && (
-//         <>
-//           {" "}
-//           {isAi && (
-//             <div
-//               className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
-//               style={{ backgroundColor: `${primaryColor}15` }}
-//             >
-//               <Bot size={14} style={{ color: primaryColor }} />
-//             </div>
-//           )}
-//           <div
-//             className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
-//               isAi
-//                 ? "bg-white/5 text-white/90 rounded-tl-sm border border-white/10"
-//                 : "text-white rounded-br-sm shadow-lg"
-//             }`}
-//             style={!isAi ? { backgroundColor: primaryColor } : {}}
-//           >
-//             {text}
-//           </div>
-//           {!isAi && (
-//             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center shrink-0">
-//               <span className="text-xs">👤</span>
-//             </div>
-//           )}
-//         </>
-//       )}
-//     </div>
-//   );
-// };
+  useEffect(() => {
+    const external_userId = params.get("user_id");
+    setexternal_userId(external_userId);
+  }, []);
+
+  useEffect(() => {
+    if (!external_userId) return;
+
+    const fetchUserAllConversations = async () => {
+      const chatbotId = params.get("bot_id");
+
+      try {
+        const res = await axios.post(
+          DB_URL + "/conversation/get-user-all-conversations",
+          {
+            chatbotId: chatbotId,
+            currentUserId: external_userId,
+          },
+        );
+
+        console.log(res.data);
+        if (res.data?.success) {
+          setuserAllConversations(res.data.allConversations);
+        } else {
+          toast.error(res.data?.message || "Failed to fetch conversations");
+        }
+      } catch (error) {
+        toast.error(error.message);
+      }
+    };
+
+    fetchUserAllConversations();
+  }, [external_userId]);
+
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const accessToken = Cookies.get("accessToken");
+        const res = await axios.post(
+          DB_URL + "/message/get-all-messages-of-conversation",
+          { conversationId: currentConversationId },
+          { headers: { Authorization: accessToken } },
+        );
+
+        if (res.data.success) {
+          setAllMessages(res.data?.messages);
+        }
+      } catch (error) {
+        console.error(error);
+        toast.error(error?.message);
+      }
+    };
+
+    fetchMessages();
+  }, [currentConversationId]);
+
+  const handleNewChat = () => {
+    setcurrentConversationId("");
+    setConversation(null);
+    setAllMessages([
+      {
+        role: "ai",
+        content:
+          chatbot?.welcomeMessage || "Hi there! How can I assist you today?",
+      },
+    ]);
+
+    setconversationSidebarOpen(false);
+  };
+
+  return (
+    <motion.div
+      initial={{ x: -300, opacity: 0 }}
+      animate={{
+        x: conversationSidebarOpen ? 0 : -300,
+        opacity: conversationSidebarOpen ? 1 : 0,
+      }}
+      transition={{ duration: 0.3 }}
+      className="w-80 top-0 left-0  h-full bg-[#0f0f13b3] backdrop-blur-sm  absolute z-50"
+    >
+      {/* close buttoon  */}
+      <div
+        onClick={() => {
+          setconversationSidebarOpen(false);
+        }}
+        className="p-3  flex justify-end border-b border-white/10 "
+      >
+        <PanelRightClose className=" text-gray-400 hover:text-white cursor-pointer  " />
+      </div>
+
+      <div className="p-3">
+        <div className="p-3 bg-black/20 hover:bg-black/40 rounded-lg cursor-pointer  ">
+          <div onClick={handleNewChat} className=" flex gap-3 items-center ">
+            <SquarePen size={20} />
+            <h2 className="text-[12px]">New Chat</h2>
+          </div>
+        </div>
+      </div>
+
+      <p className="border-b h-1"></p>
+      <div className="p-3">
+        <h2 className="text-sm font-semibold   text-gray-400">Conversations</h2>
+        <div className="flex mt-3 flex-col">
+          {userAllConversations?.map((con, i) => (
+            <div
+              onClick={() => {
+                setcurrentConversationId(con?._id);
+                setConversation(con);
+                setconversationSidebarOpen(false);
+              }}
+              key={i}
+              className="p-3 hover:bg-black/40 rounded-lg cursor-pointer  "
+            >
+              <div className=" flex  gap-3 items-center ">
+                <h2 className="text-[12px]">
+                  Conversation {i + 1} {con?._id}
+                </h2>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </motion.div>
+  );
+};
 
 import Cookies from "js-cookie";
 
@@ -681,9 +776,6 @@ const MessageBubble = ({
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
                   key={star}
-                  // onClick={() => setRatings(star)}
-                  // onMouseEnter={() => setHoverRating(star)}
-                  // onMouseLeave={() => setHoverRating(0)}
                   className="transition-transform hover:scale-110 focus:outline-none"
                 >
                   <Star
