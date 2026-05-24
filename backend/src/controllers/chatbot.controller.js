@@ -52,16 +52,10 @@ export const getChatbotAndRequiredData = async (req, res, next) => {
     if (!sections?.length)
       return res.send({ success: false, message: " sections not found" });
 
-    if (!req?.body?.conversationId) {
-      return res.send({
-        success: false,
-        message: "Conversation id is required",
-      });
-    }
-
-    const conversation = await Conversation.findOne({
-      _id: req?.body?.conversationId,
-    });
+    const conversation =
+      (await Conversation.findOne({
+        _id: req?.body?.conversationId,
+      })) || null;
 
     let allMessages = [];
 

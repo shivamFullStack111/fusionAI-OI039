@@ -57,9 +57,10 @@ export const sendMessage = async (req, res) => {
       const idToFind = req?.body?.external_userId || userIP;
 
       const newConversation = new Conversation({
-        chatbot: req.body.chatbotId,
+        chatbotId: req.body.chatbotId,
         externaluserId: idToFind,
       });
+      
       await newConversation.save();
       req.body.conversationId = newConversation._id;
     }
