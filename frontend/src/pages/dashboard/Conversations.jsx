@@ -176,7 +176,7 @@ const Conversations = () => {
       try {
         setLoadingConversations(true);
         const accessToken = Cookies.get("accessToken");
-        const res = await axios.post(
+        const res = await axios.post( 
           DB_URL + "/conversation/get-all-user-conversations",
           {},
           { headers: { Authorization: accessToken } }

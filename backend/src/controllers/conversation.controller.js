@@ -9,7 +9,7 @@ export const getAllConversations = async (req, res) => {
       return res.send({ success: false, message: "Chatbot not found" });
     }
     const conversations = await Conversation.find({
-      chatbot: req?.chatbot?._id,
+      chatbotId: chatbot?._id,
     }).sort({ updatedAt: -1 });
     return res.send({
       success: true,
@@ -20,9 +20,9 @@ export const getAllConversations = async (req, res) => {
   }
 };
 
-export const getUserAllConversations = async (req, res) => {
+export const getExternalUserAllConversations = async (req, res) => {
   try {
-    const { chatbotId, currentUserId } = req.body;
+    const { chatbotId, externalUserId } = req.body;
     if (!chatbotId) {
       return res.send({ success: false, message: "Chatbot ID is required" });
     }
@@ -31,7 +31,7 @@ export const getUserAllConversations = async (req, res) => {
 
     const conversations = await Conversation.find({
       chatbotId,
-      externaluserId: currentUserId || userIp,
+      externaluserId: externalUserId || userIp,
     }).sort({ updatedAt: -1 });
     return res.send({
       success: true,

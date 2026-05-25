@@ -467,10 +467,10 @@ const SidebarOfUserConversations = ({
 
       try {
         const res = await axios.post(
-          DB_URL + "/conversation/get-user-all-conversations",
+          DB_URL + "/conversation/get-external-user-all-conversations",
           {
             chatbotId: chatbotId,
-            currentUserId: external_userId,
+            externalUserId: external_userId,
           },
         );
 
