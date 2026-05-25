@@ -13,7 +13,6 @@ messageRoutes.post("/send-message", sendMessage);
 messageRoutes.post("/test-message", authMiddleware, testMessage);
 messageRoutes.post(
   "/get-all-messages-of-conversation",
-  authMiddleware,
   getAllMessagesOfConversation,
 );
 

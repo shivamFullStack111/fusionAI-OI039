@@ -125,7 +125,6 @@ const ChatbotUI = () => {
 
         // for create conversation on first message if not exist
         external_userId: external_userId,
-        chatbotId: chatbotId,
       });
 
       if (res.data?.success) {
