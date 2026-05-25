@@ -64,16 +64,16 @@ export const sendMessage = async (req, res) => {
       });
 
       // generate title of conversation from user first message using ai and save title in conversation collection
-      const title = await llm.invoke([
+      const result = await llm.invoke([
         {
           role: "system",
           content:
-            "Generate a short title for this conversation in maximum 3 words",
+            "Generate a short title for this conversation in maximum 3 words in plain text without any special characters and without mentioning that it's a title. just give me the title. user message is: ",
         },
         { role: "user", content: req?.body?.message },
       ]);
 
-      newConversation.title = title;
+      newConversation.title = result.content;
 
       await newConversation.save();
       isNewConversation = true;
