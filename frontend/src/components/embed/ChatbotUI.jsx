@@ -567,10 +567,11 @@ const SidebarOfUserConversations = ({
               key={i}
               className="p-3 hover:bg-black/40 rounded-lg cursor-pointer  "
             >
-              <div className=" flex  gap-3 items-center ">
-                <h2 className="text-[12px]">
-                  Conversation {i + 1} {con?._id}
+              <div className=" flex justify-between  gap-3 items-center ">
+                <h2 className="text-[12px] font-semibold">
+                  {con?.title} 
                 </h2>
+                <h6 className="text-[10px] text-gray-600">{new Date(con?.updatedAt).toLocaleDateString()}</h6>
               </div>
             </div>
           ))}
