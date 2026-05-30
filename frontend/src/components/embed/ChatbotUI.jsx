@@ -112,7 +112,8 @@ const ChatbotUI = () => {
 
     const userMessage = { role: "user", content: text };
     setAllMessages((prev) => [...prev, userMessage]);
-    setIsTyping(true);
+    if (!conversation?.isTicketRaised) setIsTyping(true) 
+      else setIsTyping(false);
 
     try {
       const res = await axios.post(DB_URL + "/message/send-message", {
@@ -138,14 +139,27 @@ const ChatbotUI = () => {
             ...prev,
           ]);
         }
-        const aiMessage = { role: "ai", content: res.data.aiMessage?.content };
-        setAllMessages((prev) => [...prev, aiMessage]);
-        if (res?.data?.aiMessage?.content == "Conversation Ended") {
-          setConversation((p) => ({ ...p, isEnded: true }));
-        }
 
-        setConversation(res.data.conversation);
-        setcurrentConversationId(res.data.conversation?._id);
+        if (res?.data?.conversationWithTicketRaised) {
+        } else {
+          const aiMessage = {
+            role: "ai",
+            content: res.data.aiMessage?.content,
+          };
+          setAllMessages((prev) => [...prev, aiMessage]);
+          if (res?.data?.aiMessage?.content == "Conversation Ended") {
+            setConversation((p) => ({ ...p, isEnded: true }));
+          }
+          if (res?.data?.aiMessage?.content == "Raise a ticket") {
+            toast.success(
+              "A support ticket has been raised. Our team will get back to you soon.",
+            );
+            setConversation((p) => ({ ...p, isTicketRaised: true }));
+          }
+
+          setConversation(res.data.conversation);
+          setcurrentConversationId(res.data.conversation?._id);
+        }
       } else {
         toast.error(res?.data?.message);
       }
@@ -568,10 +582,10 @@ const SidebarOfUserConversations = ({
               className="p-3 hover:bg-black/40 rounded-lg cursor-pointer  "
             >
               <div className=" flex justify-between  gap-3 items-center ">
-                <h2 className="text-[12px] font-semibold">
-                  {con?.title} 
-                </h2>
-                <h6 className="text-[10px] text-gray-600">{new Date(con?.updatedAt).toLocaleDateString()}</h6>
+                <h2 className="text-[12px] font-semibold">{con?.title}</h2>
+                <h6 className="text-[10px] text-gray-600">
+                  {new Date(con?.updatedAt).toLocaleDateString()}
+                </h6>
               </div>
             </div>
           ))}
