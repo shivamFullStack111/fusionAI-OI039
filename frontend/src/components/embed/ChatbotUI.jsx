@@ -605,7 +605,7 @@ const MessageBubble = ({
   onReviewSubmitted,
   setConversation,
 }) => {
-  const isAi = message.role === "ai";
+  const isAi = message.role === "ai" || message.role === "support";
   const text = message.content;
   const isConversationEnded = text === "Conversation Ended";
 

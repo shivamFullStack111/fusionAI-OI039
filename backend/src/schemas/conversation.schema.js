@@ -31,6 +31,10 @@ const conversationSchema = new mongoose.Schema(
     isTicketRaised:{
       type:Boolean,
       default:false,
+    },
+    ticketResolved:{
+      type:Boolean,
+      default:false,
     }
   },
   { timestamps: true },

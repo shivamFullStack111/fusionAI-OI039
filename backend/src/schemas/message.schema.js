@@ -6,9 +6,10 @@ const messageSchema = new mongoose.Schema({
     ref: "conversation",
     required:true
   },
+
   role: {
     type:String,
-    enum:['ai','user'],
+    enum:['ai','user','support'],  // SUPPORT is for admin and their users responses after ticket is raised
     required:true
   },
   tokens:{

@@ -1,155 +1,16 @@
-// import Code_embed_box from "@/components/common/Code_embed_box";
-// import Chatbot_playground from "@/components/common/dashboard-page/Chatbot_playground";
-// import DashboardLayout from "@/components/layout/DashboardLayout";
-// import { Button } from "@/components/ui/button";
-// import { Field, FieldLabel } from "@/components/ui/field";
-// import { Textarea } from "@/components/ui/textarea";
-// import axios from "axios";
-// import { Code, Info, Palette, Save, Search } from "lucide-react";
-// import Cookies from "js-cookie";
-// import { useEffect, useState } from "react";
-// import toast from "react-hot-toast";
-// import { DB_URL } from "../../../utils/variables.js";
-
-
-// const Conversations = () => {
-//   const [allConversations, setAllConversations] = useState([]);
-//   const [selectedConversation, setSelectedConversation] = useState(null);
-//   const [messages, setMessages] = useState([]);
-
-//   useEffect(() => {
-//     const getUserConversations = async () => {
-//       try {
-//         const accessToken = Cookies.get("accessToken");
-
-//         const res = await axios.post(
-//           DB_URL + "/conversation/get-all-user-conversations",
-//           {},
-//           {
-//             headers: { Authorization: accessToken },
-//           },
-//         );
-
-//         if (res.data.success) {
-//           setAllConversations(res.data.allConversations);
-
-//           // auto select first
-//           if (res.data?.allConversations?.length > 0) {
-//             setSelectedConversation(res.data?.allConversations[0]);
-//           }
-//         }
-//       } catch (error) {
-//         console.log(error);
-//         toast.error(error.message || "Failed to fetch conversations");
-//       }
-//     };
-
-//     getUserConversations();
-//   }, []);
-
-//   useEffect(() => {
-//     const fetchMessages = async () => {
-//       const accessToken = Cookies.get("accessToken");
-
-//       if (!accessToken) {
-//         toast.error("User not authenticated");
-//         return;
-//       }
-//       if (!selectedConversation?._id) return;
-
-//       try {
-//         const res = await axios.post(DB_URL + "/message/get-all-messages", {
-//           conversationId: selectedConversation._id,
-//         },
-//         {
-//           headers: { Authorization: accessToken },
-//         }
-//         );
-
-//         if (res.data.success) {
-//           setMessages(res.data.messages);
-//         }
-//       } catch (err) {
-//         console.log(err);
-//         toast.error(err.message || "Failed to fetch messages");
-//       }
-//     };
-
-//     fetchMessages();
-//   }, [selectedConversation]);
-
-//   return (
-//     <DashboardLayout>
-//       <div className="flex w-full">
-//         {/* LEFT SIDEBAR */}
-//         <div className="w-[30%] border-r p-4 h-screen overflow-y-auto">
-//           <div className="flex justify-between">
-//             <p>Inbox</p>
-//             <p className="text-xs text-zinc-500">
-//               {allConversations?.length} conversations
-//             </p>
-//           </div>
-
-//           {/* SEARCH */}
-//           <div className="flex gap-2 items-center border p-2 mt-4 bg-zinc-950 rounded-lg">
-//             <Search size={18} />
-//             <input
-//               placeholder="Search..."
-//               className="w-full outline-none text-sm"
-//             />
-//           </div>
-
-//           {/* LIST */}
-//           <div className="mt-4 flex flex-col gap-2">
-//             {allConversations.map((conv) => (
-//               <div
-//                 key={conv._id}
-//                 onClick={() => setSelectedConversation(conv)}
-//                 className={`p-3 rounded-lg cursor-pointer ${
-//                   selectedConversation?._id === conv._id
-//                     ? "border-blue-600 bg-zinc-900"
-//                     : "border border-zinc-900 bg-zinc-950"
-//                 }`}
-//               >
-//                 <div className="flex justify-between">
-//                   <p className="text-sm text-zinc-300">
-//                     #{conv.externaluserId || "Visitor"}
-//                   </p>
-//                   <p className="text-xs text-zinc-600">
-//                     {new Date(conv.createdAt).toLocaleTimeString()}
-//                   </p>
-//                 </div>
-
-//                 <p className="text-xs text-zinc-500 mt-1">
-//                   {conv.title || "No title"}
-//                 </p>
-//               </div>
-//             ))}
-//           </div>
-//         </div>
-
-//         {/* RIGHT CHAT */}
-//         <div className="w-[70%] h-screen">
-//           <Chatbot_playground
-//             className="h-full border-0 p-5"
-//             fullHeight="flex-1"
-//             messages={messages}
-//             setMessages={setMessages}
-//             conversation={selectedConversation}
-//           />
-//         </div>
-//       </div>
-//     </DashboardLayout>
-//   );
-// };
-
-// export default Conversations;
-
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
-import { Search, Send, Bot, User, Ticket, CheckCircle, AlertCircle } from "lucide-react";
+import {
+  Search,
+  Send,
+  Bot,
+  User,
+  Ticket,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
 import Cookies from "js-cookie";
 import { useEffect, useState, useRef } from "react";
 import toast from "react-hot-toast";
@@ -176,10 +37,10 @@ const Conversations = () => {
       try {
         setLoadingConversations(true);
         const accessToken = Cookies.get("accessToken");
-        const res = await axios.post( 
+        const res = await axios.post(
           DB_URL + "/conversation/get-all-user-conversations",
           {},
-          { headers: { Authorization: accessToken } }
+          { headers: { Authorization: accessToken } },
         );
 
         if (res.data.success) {
@@ -209,7 +70,7 @@ const Conversations = () => {
         const res = await axios.post(
           DB_URL + "/message/get-all-messages-of-conversation",
           { conversationId: selectedConversation._id },
-          { headers: { Authorization: accessToken } }
+          { headers: { Authorization: accessToken } },
         );
 
         if (res.data.success) {
@@ -226,7 +87,6 @@ const Conversations = () => {
     fetchMessages();
   }, [selectedConversation]);
 
-
   // Resolve ticket
   const handleResolveTicket = async () => {
     try {
@@ -234,11 +94,15 @@ const Conversations = () => {
       const res = await axios.post(
         DB_URL + "/conversation/resolve-ticket",
         { conversationId: selectedConversation._id },
-        { headers: { Authorization: accessToken } }
+        { headers: { Authorization: accessToken } },
       );
 
       if (res.data.success) {
-        setSelectedConversation({ ...selectedConversation, ticketRaised: false, ticketResolved: true });
+        setSelectedConversation({
+          ...selectedConversation,
+          ticketRaised: false,
+          ticketResolved: true,
+        });
         toast.success("Ticket resolved!");
       }
     } catch (error) {
@@ -250,7 +114,7 @@ const Conversations = () => {
   // Send message (admin response when ticketRaised is true)
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
-    if (!selectedConversation?.ticketRaised) {
+    if (!selectedConversation?.isTicketRaised) {
       toast.error("Cannot send message. Ticket not raised.");
       return;
     }
@@ -262,7 +126,7 @@ const Conversations = () => {
     // Optimistically add message to UI
     const tempMessage = {
       _id: Date.now(),
-      role: "user",
+      role: "support",
       content: messageToSend,
       createdAt: new Date(),
     };
@@ -271,17 +135,15 @@ const Conversations = () => {
     try {
       const accessToken = Cookies.get("accessToken");
       const res = await axios.post(
-        DB_URL + "/message/send-message",
+        DB_URL + "/message/send-message-by-support", // SUPPORT is for admin and their users responses after ticket is raised
         {
           message: messageToSend,
           conversationId: selectedConversation._id,
-          // No chatbotId needed for admin response
         },
-        { headers: { Authorization: accessToken } }
+        { headers: { Authorization: accessToken } },
       );
 
       if (res.data.success) {
-        // Replace temp message with real one if needed
         toast.success("Response sent to user");
       } else {
         // Remove temp message on failure
@@ -301,7 +163,11 @@ const Conversations = () => {
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      if (selectedConversation?.ticketRaised && inputMessage.trim() && !isSending) {
+      if (
+        selectedConversation?.ticketRaised &&
+        inputMessage.trim() &&
+        !isSending
+      ) {
         handleSendMessage();
       }
     }
@@ -335,7 +201,9 @@ const Conversations = () => {
             {loadingConversations ? (
               <div className="text-center text-zinc-500 py-8">Loading...</div>
             ) : allConversations.length === 0 ? (
-              <div className="text-center text-zinc-500 py-8">No conversations</div>
+              <div className="text-center text-zinc-500 py-8">
+                No conversations
+              </div>
             ) : (
               allConversations.map((conv) => (
                 <div
@@ -393,28 +261,28 @@ const Conversations = () => {
                   Conversation ID: {selectedConversation?._id?.slice(-8)}
                 </p>
               </div>
-              
+
               {/* Ticket Status & Actions */}
               {selectedConversation && (
                 <div>
-               
-                  {selectedConversation?.ticketRaised && !selectedConversation?.ticketResolved && (
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs bg-yellow-600/20 text-yellow-500 px-3 py-1.5 rounded-full flex items-center gap-2">
-                        <AlertCircle size={12} />
-                        Ticket Open - You can respond
-                      </span>
-                      <Button
-                        onClick={handleResolveTicket}
-                        size="sm"
-                        variant="outline"
-                        className="gap-2 border-green-600 text-green-600 hover:bg-green-600/10"
-                      >
-                        <CheckCircle size={14} />
-                        Mark Resolved
-                      </Button>
-                    </div>
-                  )}
+                  {selectedConversation?.ticketRaised &&
+                    !selectedConversation?.ticketResolved && (
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs bg-yellow-600/20 text-yellow-500 px-3 py-1.5 rounded-full flex items-center gap-2">
+                          <AlertCircle size={12} />
+                          Ticket Open - You can respond
+                        </span>
+                        <Button
+                          onClick={handleResolveTicket}
+                          size="sm"
+                          variant="outline"
+                          className="gap-2 border-green-600 text-green-600 hover:bg-green-600/10"
+                        >
+                          <CheckCircle size={14} />
+                          Mark Resolved
+                        </Button>
+                      </div>
+                    )}
                   {selectedConversation.ticketResolved && (
                     <span className="text-xs bg-green-600/20 text-green-500 px-3 py-1.5 rounded-full flex items-center gap-2">
                       <CheckCircle size={12} />
@@ -429,7 +297,9 @@ const Conversations = () => {
           {/* Messages Area */}
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {loadingMessages ? (
-              <div className="text-center text-zinc-500 py-8">Loading messages...</div>
+              <div className="text-center text-zinc-500 py-8">
+                Loading messages...
+              </div>
             ) : messages.length === 0 ? (
               <div className="text-center text-zinc-500 py-8">
                 <Bot size={40} className="mx-auto mb-3 text-zinc-700" />
@@ -449,7 +319,8 @@ const Conversations = () => {
               <div className="text-center text-zinc-600 text-sm py-3">
                 Select a conversation to view messages
               </div>
-            ) : selectedConversation.ticketRaised && !selectedConversation.ticketResolved ? (
+            ) : selectedConversation.isTicketRaised &&
+              !selectedConversation.ticketResolved ? (
               <div className="flex gap-3">
                 <Textarea
                   value={inputMessage}
@@ -468,14 +339,17 @@ const Conversations = () => {
                   {isSending ? "Sending..." : "Send"}
                 </Button>
               </div>
-            ) : selectedConversation.ticketResolved ? (
+            ) : selectedConversation?.ticketResolved ? (
               <div className="text-center text-green-600/70 text-sm py-3 bg-green-600/5 rounded-lg border border-green-600/20">
                 <CheckCircle size={16} className="inline mr-2" />
                 This ticket has been resolved. Cannot send more messages.
               </div>
             ) : (
               <div className="text-center text-zinc-600 text-sm py-3 bg-zinc-900/50 rounded-lg border border-zinc-800">
-                <AlertCircle size={16} className="inline mr-2 text-yellow-600" />
+                <AlertCircle
+                  size={16}
+                  className="inline mr-2 text-yellow-600"
+                />
                 Raise a ticket to respond to this user
               </div>
             )}
@@ -488,7 +362,7 @@ const Conversations = () => {
 
 // Message Bubble Component
 const MessageBubble = ({ message }) => {
-  const isAi = message.role === "ai";
+  const isAi = message.role === "ai" || message.role === "support"; // SUPPORT messages are also shown on left side as they are from admin/support
   const isUser = message.role === "user";
 
   return (
@@ -506,9 +380,14 @@ const MessageBubble = ({ message }) => {
             : "bg-blue-600 text-white rounded-br-sm"
         }`}
       >
-        <p className="whitespace-pre-wrap break-words">{message.content}</p>
-        <p className={`text-[10px] mt-1 ${isAi ? "text-zinc-600" : "text-blue-200/70"}`}>
-          {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        <p className="whitespace-pre-wrap wrap-break-words">{message.content}</p>
+        <p
+          className={`text-[10px] mt-1 ${isAi ? "text-zinc-600" : "text-blue-200/70"}`}
+        >
+          {new Date(message.createdAt).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
         </p>
       </div>
 

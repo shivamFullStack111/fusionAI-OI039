@@ -226,6 +226,48 @@ export const sendMessage = async (req, res) => {
   }
 };
 
+export const sendMessageBySupport = async (req, res) => {
+  try {
+    const { conversationId, message } = req.body;
+
+    if (!conversationId || !message) {
+      return res.send({
+        success: false,
+        message: "Conversation id and message are required",
+      });
+    }
+
+    const conversation = await Conversation.findById(conversationId);
+    if (!conversation) {
+      return res.send({
+        success: false,
+        message: "Conversation not found",
+      });
+    }
+    if (!conversation?.isTicketRaised) {
+      return res.send({
+        success: false,
+        message: "Ticket is not raised for this conversation",
+      });
+    }
+
+    const newMessageSupport = new Message({
+      conversationId,
+      role: "support",
+      content: message,
+    });
+    await newMessageSupport.save();
+
+    return res.send({
+      success: true,
+      message: "Support message sent",
+      supportMessage: newMessageSupport,
+    });
+  } catch (error) {
+    return res.send({ success: false, message: error.message });
+  }
+};
+
 export const testMessage = async (req, res) => {
   try {
     const { message, allMessages } = req.body;
