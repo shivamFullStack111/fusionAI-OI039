@@ -8,11 +8,6 @@ const memberSchema = new mongoose.Schema(
       ref: "user",
       required: true,
     },
-    chatbotId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "chatbot",
-      required: true,
-    },
     name: {
       type: String,
       required: true,
@@ -29,6 +24,7 @@ const memberSchema = new mongoose.Schema(
     role: {
       type: String,
       required: true,
+      default: "member",
       enum: ["admin", "member"],
     },
   },
