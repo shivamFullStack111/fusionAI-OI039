@@ -3,12 +3,16 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from "../utils.js";
 import CookieParser from "cookie-parser";
-import { setRefreshTokenCookies } from "../utils/functions.js";
+import {
+  clearRefreshTokenCookie,
+  setRefreshTokenCookies,
+} from "../utils/functions.js";
 import { Knowledge } from "../schemas/knowledge.schema.js";
 import { Section } from "../schemas/section.schema.js";
 import { Chatbot } from "../schemas/chatbot.schema.js";
 import { Message } from "../schemas/message.schema.js";
 import { Conversation } from "../schemas/conversation.schema.js";
+import { denyMemberAction, getWorkspaceUserId } from "../utils/workspace.js";
 
 export const register = async (req, res) => {
   try {
@@ -76,6 +80,8 @@ export const register = async (req, res) => {
         _id: newUser?._id,
         name: newUser?.name,
         email: newUser?.email,
+        role: newUser?.role,
+        parentUserId: newUser?.parentUserId,
       },
     });
   } catch (error) {
@@ -118,7 +124,7 @@ export const login = async (req, res) => {
     });
 
     setRefreshTokenCookies(res, refreshToken);
-    
+
     return res.send({
       success: true,
       message: "Login success",
@@ -127,6 +133,8 @@ export const login = async (req, res) => {
         _id: user?._id,
         name: user?.name,
         email: user?.email,
+        role: user?.role,
+        parentUserId: user?.parentUserId,
       },
     });
   } catch (error) {
@@ -136,28 +144,32 @@ export const login = async (req, res) => {
 
 export const logout = (req, res) => {
   try {
-    res.clearCookie("refreshToken");
+    clearRefreshTokenCookie(res);
 
     return res.send({ success: true, message: "Logout success" });
   } catch (error) {
-    return res.send({ success: false, message: error.message });
+    clearRefreshTokenCookie(res);
+    return res.status(401).send({ success: false, message: error.message });
   }
 };
 
 export const refreshToken = async (req, res) => {
   try {
-    const refreshToken = req.cookies.refreshToken;
+    const currentRefreshToken = req.cookies.refreshToken;
 
-    if (!refreshToken)
+    if (!currentRefreshToken) {
+      clearRefreshTokenCookie(res);
       return res
         .status(401)
         .send({ success: false, message: "refresh token not found" });
+    }
 
-    const userr = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
+    const userr = jwt.verify(currentRefreshToken, REFRESH_TOKEN_SECRET);
 
     const user = await User.findOne({ _id: userr?._id });
 
     if (!user) {
+      clearRefreshTokenCookie(res);
       return res
         .status(401)
         .send({ success: false, message: "Token is expired or invalid" });
@@ -167,16 +179,25 @@ export const refreshToken = async (req, res) => {
       expiresIn: "15m",
     });
 
+    const newRefreshToken = jwt.sign({ _id: user?._id }, REFRESH_TOKEN_SECRET, {
+      expiresIn: "7d",
+    });
+
+    setRefreshTokenCookies(res, newRefreshToken);
+
     return res.send({ success: true, message: "token refreshed", accessToken });
   } catch (error) {
-    return res.send({ success: false, message: error.message });
+    clearRefreshTokenCookie(res);
+    return res.status(401).send({ success: false, message: error.message });
   }
 };
 
 // checking in middleware
 export const isAuthenticated = async (req, res) => {
   try {
-    const user = await User.findOne({ _id: req.user?._id });
+    const user = await User.findOne({ _id: req.user?._id }).select(
+      "-password",
+    );
     return res.send({
       success: true,
       message: "user is authenticated",
@@ -219,17 +240,134 @@ export const changePassword = async (req, res) => {
   }
 };
 
+export const createUserMember = async (req, res) => {
+  try {
+    if (denyMemberAction(req, res, "create team members")) return;
+
+    const { name, email, password } = req.body;
+
+    if (!name || !email || !password)
+      return res.send({
+        success: false,
+        message: "name, email and password are required",
+      });
+
+    const isExistingUser = await User.findOne({ email });
+
+    if (isExistingUser) {
+      return res.send({
+        success: false,
+        message: "User with this email already exists.",
+      });
+    }
+
+    const userCurrentPlan = req.userCurrentPlan;
+
+    const totalUserMembers = await User.countDocuments({
+      parentUserId: req.user?._id,
+      role: "member",
+    });
+
+    if (totalUserMembers >= userCurrentPlan?.totalTeamMembers) {
+      return res.send({
+        success: false,
+        message: "Maximum user already created!",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newMember = new User({
+      name,
+      email,
+      password: hashedPassword,
+      role: "member",
+      parentUserId: req.user?._id,
+      isAdmin: false,
+    });
+
+    await newMember.save();
+
+    const member = newMember.toObject();
+    delete member.password;
+
+    return res.send({
+      success: true,
+      message: "Member created successfully.",
+      member,
+    });
+  } catch (error) {
+    return res.send({ success: false, message: error.message });
+  }
+};
+
+export const getUserMembers = async (req, res) => {
+  try {
+    const workspaceUserId = getWorkspaceUserId(req.user);
+
+    const members = await User.find({
+      parentUserId: workspaceUserId,
+      role: "member",
+    }).select("-password");
+
+    return res.send({
+      success: true,
+      message: "Get all members of user",
+      members,
+    });
+  } catch (error) {
+    return res.send({ success: false, message: error.message });
+  }
+};
+
+export const deleteUserMember = async (req, res) => {
+  try {
+    if (denyMemberAction(req, res, "delete team members")) return;
+
+    const { memberId } = req?.body;
+
+    if (!memberId)
+      return res.status(400).send({
+        success: false,
+        message: "Member id is required to delete",
+      });
+
+    const member = await User.findOne({ _id: memberId, role: "member" });
+
+    if (!member)
+      return res
+        .status(404)
+        .send({ success: false, message: "Member not found!" });
+
+    if (member?.parentUserId?.toString() !== req?.user?._id?.toString()) {
+      return res.status(403).send({
+        success: false,
+        message: "You cannot delete this member",
+      });
+    }
+
+    await User.findOneAndDelete({ _id: memberId });
+
+    return res.send({ success: true, message: "Member deleted!" });
+  } catch (error) {
+    return res.send({ success: false, message: error.message });
+  }
+};
+
 export const getDashboardData = async (req, res) => {
   try {
-    const user = await User.findOne({ _id: req?.user?._id });
+    const workspaceUserId = getWorkspaceUserId(req.user);
+    const user = await User.findOne({ _id: workspaceUserId }).select(
+      "-password",
+    );
 
     const knowledges = await Knowledge.find({
-      userId: req?.user?._id,
+      userId: workspaceUserId,
     });
     const sections = await Section.find({
-      userId: req?.user?._id,
+      userId: workspaceUserId,
     });
-    const chatbot = await Chatbot.findOne({ userId: req?.user?._id });
+    const chatbot = await Chatbot.findOne({ userId: workspaceUserId });
     const recent5Conversations = await Conversation.find({
       chatbotId: chatbot?._id,
     })

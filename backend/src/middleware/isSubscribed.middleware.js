@@ -2,7 +2,7 @@ import { Subscription } from "../schemas/subscription.schema.js";
 
 export const isSubscribed = async (req, res, next) => {
   try {
-    const userId = req.user._id;
+    const userId = req.workspaceUserId || req.user._id;
 
     const userCurrentPlan = await Subscription.findOne({ userId })
       .sort({ createdAt: -1 })

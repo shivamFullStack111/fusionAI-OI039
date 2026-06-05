@@ -1,10 +1,14 @@
 import jwt from "jsonwebtoken";
 import { ACCESS_TOKEN_SECRET } from "../utils.js";
 import { User } from "../schemas/user.schema.js";
+import { getWorkspaceUserId } from "../utils/workspace.js";
 
 export const authMiddleware = async (req, res, next) => {
   try {
-    const authToken = req.headers.authorization;
+    const authHeader = req.headers.authorization;
+    const authToken = authHeader?.startsWith("Bearer ")
+      ? authHeader.split(" ")[1]
+      : authHeader;
 
     if (!authToken)
       return res
@@ -28,6 +32,7 @@ export const authMiddleware = async (req, res, next) => {
     }
 
     req.user = userr;
+    req.workspaceUserId = getWorkspaceUserId(userr);
 
     next();
   } catch (error) {

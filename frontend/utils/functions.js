@@ -15,12 +15,6 @@ export const validateUrl = (url) => {
 };
 
 export const getAccessToken = () => {
-  const accessToken = Cookies.get("accessToken");
-
-  if (!accessToken) {
-    throw new Error("Token not found");
-  }
-
-  return accessToken;
+  return Cookies.get("accessToken") || null;
 };
 

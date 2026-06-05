@@ -36,6 +36,7 @@ import toast from "react-hot-toast";
 import Loader from "../Loader.jsx";
 import { DB_URL } from "../../../../utils/variables.js";
 import { Switch } from "@/components/ui/switch.jsx";
+import { useSelector } from "react-redux";
 
 function ViewSection_drawer({
   section: sn,
@@ -55,6 +56,8 @@ function ViewSection_drawer({
   const [blockedTopics, setblockedTopics] = useState("");
 
   const [isEditable, setisEditable] = useState(false);
+  const { user } = useSelector((state) => state.auth);
+  const canDeleteSection = user?.role !== "member";
 
   const [loading, setloading] = useState(false);
   const [ksOpen, setksOpen] = useState(false);
@@ -505,7 +508,7 @@ function ViewSection_drawer({
           </div>
         )}
 
-        {!isEditable && (
+        {!isEditable && canDeleteSection && (
           <DrawerFooter className="p-4 bg-[#ff000024]">
             <div>
               <p className="text-red-600">Danger Zone</p>

@@ -10,13 +10,10 @@ import knowledgeRoutes from "./routes/knowledge.routes.js";
 import sectionRoutes from "./routes/section.routes.js";
 import chatbotRoutes from "./routes/chatbot.routes.js";
 import messageRoutes from "./routes/message.routes.js";
-import conversationRoutes from './routes/conversation.routes.js';
-import http from "http"
-import {Server} from "socket.io"
+import conversationRoutes from "./routes/conversation.routes.js";
+import http from "http";
+import { Server } from "socket.io";
 import { initializeSocket } from "./config/initializeSocket.js";
-import { memberRoutes } from "./routes/member.routes.js";
-
-
 
 // configs
 dotenv.config();
@@ -50,26 +47,18 @@ app.use("/api/knowledge", knowledgeRoutes);
 app.use("/api/section", sectionRoutes);
 app.use("/api/chatbot", chatbotRoutes);
 app.use("/api/conversation", conversationRoutes);
-app.use("/api/member", memberRoutes);
-
-
-
-
 
 // health -
 app.get("/", (req, res) => {
   return res.send({ success: true, message: "server listening" });
 });
 
-
-
-// creating server so we could run socket and express server in same port 
+// creating server so we could run socket and express server in same port
 
 const server = http.createServer(app);
-const io = initializeSocket(server)
+const io = initializeSocket(server);
 
- 
 // server listeningp--
-server.listen(7474, '0.0.0.0',() => {
+server.listen(7474, "0.0.0.0", () => {
   console.log("Server running on port 7474");
 });

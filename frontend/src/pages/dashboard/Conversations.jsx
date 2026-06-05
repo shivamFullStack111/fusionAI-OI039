@@ -165,7 +165,7 @@ const Conversations = () => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       if (
-        selectedConversation?.ticketRaised &&
+        selectedConversation?.isTicketRaised &&
         inputMessage.trim() &&
         !isSending
       ) {
@@ -222,7 +222,7 @@ const Conversations = () => {
                         <p className="text-sm text-zinc-300 font-medium truncate">
                           #{conv.externaluserId || "Visitor"}
                         </p>
-                        {conv.ticketRaised && !conv.ticketResolved && (
+                        {conv.isTicketRaised && !conv.ticketResolved && (
                           <span className="text-xs bg-yellow-600/20 text-yellow-500 px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0">
                             <AlertCircle size={10} />
                             Open
@@ -319,7 +319,7 @@ const Conversations = () => {
               <div className="text-center text-zinc-600 text-sm py-3">
                 Select a conversation to view messages
               </div>
-            ) : selectedConversation?.isResolved ? (
+            ) : selectedConversation?.ticketResolved ? (
               <div className="text-center text-green-600/70 text-sm py-3 bg-green-600/5 rounded-lg border border-green-600/20">
                 <CheckCircle size={16} className="inline mr-2" />
                 This ticket has been resolved. Cannot send more messages.

@@ -11,10 +11,11 @@ import {
 import { Chatbot } from "../schemas/chatbot.schema.js";
 import { Section } from "../schemas/section.schema.js";
 import { collection } from "../config/vectorDatabaseConfig.js";
+import { denyMemberAction, getWorkspaceUserId } from "../utils/workspace.js";
 
 export const addKnowledge = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const userId = getWorkspaceUserId(req.user);
 
     if (!req?.body?.knowledgeType)
       return res.send({
@@ -37,7 +38,7 @@ export const addKnowledge = async (req, res) => {
       });
     }
 
-    const user_chatbot = await Chatbot.findOne({ userId: req.user?._id });
+    const user_chatbot = await Chatbot.findOne({ userId });
 
     if (!user_chatbot)
       return res.send({
@@ -57,7 +58,7 @@ export const addKnowledge = async (req, res) => {
       const { content: summarizedData } = await summarizeData(websiteData);
 
       const newKnowledge = new Knowledge({
-        userId: req.user?._id,
+        userId,
         knowledgeType: "website",
         webite: {
           url: websiteUrl,
@@ -76,7 +77,7 @@ export const addKnowledge = async (req, res) => {
         await generateEmbedingsOfChunks(
           chunks,
           newKnowledge?._id,
-          req.user?._id,
+          userId,
           user_chatbot?._id,
         );
 
@@ -102,7 +103,7 @@ export const addKnowledge = async (req, res) => {
       const { content: summarizedData } = await summarizeData(content, title);
 
       const newKnowledge = new Knowledge({
-        userId: req.user?._id,
+        userId,
         knowledgeType: "text",
         text: {
           title: title,
@@ -121,7 +122,7 @@ export const addKnowledge = async (req, res) => {
         await generateEmbedingsOfChunks(
           chunks,
           newKnowledge?._id,
-          req.user?._id,
+          userId,
           user_chatbot?._id,
         );
 
@@ -141,7 +142,7 @@ export const addKnowledge = async (req, res) => {
       const { content: summarizedData } = await summarizeData(fileText);
 
       const newKnowledge = new Knowledge({
-        userId: req.user?._id,
+        userId,
         knowledgeType: "file",
         file: {
           fileType: req.file?.mimetype,
@@ -161,7 +162,7 @@ export const addKnowledge = async (req, res) => {
         await generateEmbedingsOfChunks(
           chunks,
           newKnowledge?._id,
-          req.user?._id,
+          userId,
           user_chatbot?._id,
         );
 
@@ -203,7 +204,7 @@ export const getAllKnowledge = async (req, res) => {
     console.log(conditions);
 
     const knowledges = await Knowledge.find({
-      userId: req?.user?._id,
+      userId: getWorkspaceUserId(req.user),
       ...conditions,
     }).sort({ createdAt: -1 });
 
@@ -215,17 +216,30 @@ export const getAllKnowledge = async (req, res) => {
 
 export const deleteKnowledge = async (req, res) => {
   try {
+    if (denyMemberAction(req, res, "delete knowledge")) return;
+
     if (!req?.body?.knowledgeId)
       return res.send({ success: false, message: "Knowledge id is required" });
+    const workspaceUserId = getWorkspaceUserId(req.user);
 
     const sections = await Section.updateMany(
       {
         knowledgeSourceIds: req?.body?.knowledgeId,
+        userId: workspaceUserId,
       },
       { $pull: { knowledgeSourceIds: req?.body?.knowledgeId } },
     );
 
-    await Knowledge.findOneAndDelete({ _id: req?.body?.knowledgeId });
+    const deletedKnowledge = await Knowledge.findOneAndDelete({
+      _id: req?.body?.knowledgeId,
+      userId: workspaceUserId,
+    });
+
+    if (!deletedKnowledge) {
+      return res
+        .status(404)
+        .send({ success: false, message: "Knowledge not found" });
+    }
 
     // deleting knowledge embeddings from vector db
     await collection.delete({
@@ -247,7 +261,7 @@ export const updateKnowledge = async (req, res) => {
     }
 
     const knowledge = await Knowledge.findOneAndUpdate(
-      { _id: req?.body?.knowledgeId, userId: req?.user?._id },
+      { _id: req?.body?.knowledgeId, userId: getWorkspaceUserId(req.user) },
       {
         $set: {
           isActive: req?.body?.isActive,

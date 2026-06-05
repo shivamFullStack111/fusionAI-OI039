@@ -32,11 +32,14 @@ import axios from "axios";
 import { DB_URL } from "../../../utils/variables.js";
 
 import { getAccessToken } from "../../../utils/functions.js";
+import { useSelector } from "react-redux";
 
 function ViewKnowledge_drawer({ knowledge, allKnowledges, setallKnowledges }) {
   const [loading, setloading] = useState(false);
   const [isEditable, setisEditable] = useState(false);
   const [isActive, setisActive] = useState(false);
+  const { user } = useSelector((state) => state.auth);
+  const canDeleteKnowledge = user?.role !== "member";
 
   useEffect(() => {
     setisActive(knowledge?.isActive == true ? true : false);
@@ -136,7 +139,7 @@ function ViewKnowledge_drawer({ knowledge, allKnowledges, setallKnowledges }) {
           />
         )}
         <DrawerFooter>
-          {!isEditable && (
+          {!isEditable && canDeleteKnowledge && (
             <div className="p-4 bg-[#ff000024] rounded-lg">
               <p className="text-red-600">Danger Zone</p>
               <p className="text-red-800 text-xs mt-1">

@@ -36,7 +36,8 @@ const SignIn_SignUp = ({ buttonClassName, buttonTitle, type = "signin" }) => {
 
     const dispatch = useDispatch();
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e?.preventDefault();
     try {
       setloading(true);
       if (pageType == "signup") {
@@ -88,6 +89,7 @@ const SignIn_SignUp = ({ buttonClassName, buttonTitle, type = "signin" }) => {
         Cookies.set("accessToken", res?.data?.accessToken, {
           expires: expire_minutes_15,
         });
+        axios.defaults.headers.common.Authorization = res?.data?.accessToken;
 
         localStorage.setItem("user", JSON.stringify(res.data?.user));
 
@@ -100,6 +102,7 @@ const SignIn_SignUp = ({ buttonClassName, buttonTitle, type = "signin" }) => {
       }
     } catch (error) {
       toast.error(error.message);
+      console.log(error.message)
     } finally {
       setloading(false);
     }

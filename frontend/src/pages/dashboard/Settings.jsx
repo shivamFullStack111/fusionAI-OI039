@@ -128,6 +128,7 @@ const WorkspaceSettings = () => {
 
 const TeamMembers = () => {
   const { user } = useSelector((state) => state.auth);
+  const isMember = user?.role === "member";
 
   const [allMembers, setAllMembers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -143,10 +144,8 @@ const TeamMembers = () => {
         setLoading(true);
 
         const res = await axios.post(
-          `${DB_URL}/member/get-user-members`,
-          {
-            userId: user?._id,
-          },
+          `${DB_URL}/user/member/get-user-members`,
+          {},
           {
             headers: {
               Authorization: Cookies.get("accessToken"),
@@ -176,7 +175,7 @@ const TeamMembers = () => {
       setDeleteLoading(true);
 
       const res = await axios.post(
-        `${DB_URL}/member/delete`,
+        `${DB_URL}/user/member/delete`,
         {
           memberId: memberToDelete?._id,
         },
@@ -217,10 +216,12 @@ const TeamMembers = () => {
             </p>
           </div>
 
-          <AddUserDialog
-            setAllMembers={setAllMembers}
-            allMembers={allMembers}
-          />
+          {!isMember && (
+            <AddUserDialog
+              setAllMembers={setAllMembers}
+              allMembers={allMembers}
+            />
+          )}
         </div>
 
         {/* Loading Skeleton */}
@@ -256,13 +257,15 @@ const TeamMembers = () => {
                   <p className="text-sm text-zinc-500">{member?.email}</p>
                 </div>
 
-                <button
-                  onClick={() => setMemberToDelete(member)}
-                  disabled={member?._id === user?._id}
-                  className="bg-red-600 hover:bg-red-700 disabled:bg-zinc-700 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md text-sm transition"
-                >
-                  Delete
-                </button>
+                {!isMember && (
+                  <button
+                    onClick={() => setMemberToDelete(member)}
+                    disabled={member?._id === user?._id}
+                    className="bg-red-600 hover:bg-red-700 disabled:bg-zinc-700 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md text-sm transition"
+                  >
+                    Delete
+                  </button>
+                )}
               </div>
             ))}
           </div>
@@ -304,8 +307,6 @@ const TeamMembers = () => {
     </>
   );
 };
-
-
 
 const LogOut = ({ navigate }) => {
   const handleLogOut = async () => {
@@ -364,12 +365,11 @@ const AddUserDialog = ({ setAllMembers, allMembers }) => {
     try {
       const accessToken = Cookies.get("accessToken");
       const res = await axios.post(
-        DB_URL + "/member/create",
+        DB_URL + "/user/member/create",
         {
           name,
           email,
           password,
-          userId: user?._id,
         },
         {
           headers: {

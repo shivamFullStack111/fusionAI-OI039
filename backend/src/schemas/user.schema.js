@@ -10,6 +10,17 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    role: {
+      type: String,
+      required: true,
+      default: "admin",
+      enum: ["admin", "member"],
+    },
+    parentUserId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
+      immutable: true,
+    },
     email: {
       type: String,
       required: true,

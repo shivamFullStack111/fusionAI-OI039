@@ -5,10 +5,13 @@ import { Section } from "../schemas/section.schema.js";
 import { Subscription } from "../schemas/subscription.schema.js";
 import { User } from "../schemas/user.schema.js";
 import { isSubscribed_function } from "../utils/functions.js";
+import { getWorkspaceUserId } from "../utils/workspace.js";
 
 export const getUserChatbot = async (req, res) => {
   try {
-    const chatbot = await Chatbot.findOne({ userId: req.user?._id });
+    const chatbot = await Chatbot.findOne({
+      userId: getWorkspaceUserId(req.user),
+    });
 
     if (!chatbot)
       return res.send({ success: false, message: "User chatbot not found" });
@@ -98,7 +101,7 @@ export const updateChatbot = async (req, res) => {
       dataToUpdate.welcomeMessage = req.body?.welcomeMessage;
 
     const chatbot = await Chatbot.findOneAndUpdate(
-      { userId: req?.user?._id, _id: req?.body?.chatbotId },
+      { userId: getWorkspaceUserId(req.user), _id: req?.body?.chatbotId },
       { $set: dataToUpdate },
       { returnDocument: "after" },
     );

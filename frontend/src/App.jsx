@@ -33,80 +33,197 @@ const App = () => {
   const navigate = useNavigate();
   const { isLoading } = useSelector((state) => state.auth);
 
+  axios.defaults.withCredentials = true;
+
+  const accessTokenCookieOptions = () => ({
+    expires: new Date(new Date().getTime() + 15 * 60 * 1000),
+  });
+
+  const setAccessTokenHeader = (token) => {
+    if (token) {
+      axios.defaults.headers.common.Authorization = token;
+    } else {
+      delete axios.defaults.headers.common.Authorization;
+    }
+  };
+
+  const setClientAccessToken = (token) => {
+    if (!token) return;
+
+    Cookies.set("accessToken", token, accessTokenCookieOptions());
+    setAccessTokenHeader(token);
+    dispatch(setAccessToken(token));
+  };
+
+  const clearAuthState = () => {
+    dispatch(setIsAuthenticated(false));
+    dispatch(setUser(null));
+    dispatch(setAccessToken(null));
+    dispatch(setIsLoading(false));
+    localStorage.removeItem("user");
+    Cookies.remove("accessToken");
+    setAccessTokenHeader(null);
+  };
+
+  const handleLogOut = async ({ callApi = true } = {}) => {
+    try {
+      if (callApi) {
+        await axios.get(DB_URL + "/user/logout", {
+          withCredentials: true,
+          skipAuthRefresh: true,
+        });
+      }
+    } catch (error) {
+      console.log(error.message);
+    } finally {
+      clearAuthState();
+      navigate("/");
+    }
+  };
+
+  const refreshAccessToken = async () => {
+    const res = await axios.get(DB_URL + "/user/refresh-token", {
+      withCredentials: true,
+      skipAuthRefresh: true,
+    });
+
+    if (!res.data?.success || !res.data?.accessToken) {
+      throw new Error(res.data?.message || "Unable to refresh token");
+    }
+
+    setClientAccessToken(res.data.accessToken);
+    return res.data.accessToken;
+  };
+
+  const checkAuth = async (isRetry = false) => {
+    try {
+      const accessToken = Cookies.get("accessToken");
+      const token = accessToken || (await refreshAccessToken());
+
+      const res = await axios.get(DB_URL + "/user/isAuthenticated", {
+        headers: {
+          Authorization: token,
+        },
+      });
+
+      if (res.data?.success) {
+        const activeToken = Cookies.get("accessToken") || token;
+        dispatch(setIsAuthenticated(true));
+        dispatch(setUser(res?.data?.user));
+        setClientAccessToken(activeToken);
+
+        localStorage.setItem("user", JSON.stringify(res.data?.user));
+      }
+    } catch (error) {
+      if (error.response?.status == 401 && !isRetry) {
+        try {
+          await refreshAccessToken();
+          return await checkAuth(true);
+        } catch {
+          return await handleLogOut({ callApi: false });
+        }
+      }
+
+      if (!Cookies.get("accessToken")) {
+        clearAuthState();
+      }
+
+      console.log(error.message);
+    }
+  };
+
   useEffect(() => {
+    let isRefreshing = false;
+    let failedQueue = [];
+
+    const processQueue = (error, token = null) => {
+      failedQueue.forEach(({ resolve, reject }) => {
+        if (error) reject(error);
+        else resolve(token);
+      });
+      failedQueue = [];
+    };
+
+    const isAuthEndpoint = (url = "") =>
+      url.includes("/user/refresh-token") ||
+      url.includes("/user/login") ||
+      url.includes("/user/register") ||
+      url.includes("/user/logout");
+
+    const requestInterceptor = axios.interceptors.request.use(
+      (config) => {
+        if (!config.skipAuthRefresh) {
+          const token = Cookies.get("accessToken");
+          config.headers = config.headers || {};
+
+          if (token) {
+            config.headers.Authorization = token;
+          } else {
+            delete config.headers.Authorization;
+          }
+        }
+
+        return config;
+      },
+      (error) => Promise.reject(error),
+    );
+
+    const responseInterceptor = axios.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        const originalRequest = error.config;
+
+        if (
+          error.response?.status !== 401 ||
+          !originalRequest ||
+          originalRequest._retry ||
+          originalRequest.skipAuthRefresh ||
+          isAuthEndpoint(originalRequest.url)
+        ) {
+          return Promise.reject(error);
+        }
+
+        originalRequest._retry = true;
+
+        if (isRefreshing) {
+          return new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject });
+          }).then((token) => {
+            originalRequest.headers = originalRequest.headers || {};
+            originalRequest.headers.Authorization = token;
+            return axios(originalRequest);
+          });
+        }
+
+        isRefreshing = true;
+
+        try {
+          const newToken = await refreshAccessToken();
+          processQueue(null, newToken);
+          originalRequest.headers = originalRequest.headers || {};
+          originalRequest.headers.Authorization = newToken;
+          return axios(originalRequest);
+        } catch (refreshError) {
+          processQueue(refreshError, null);
+          await handleLogOut({ callApi: false });
+          return Promise.reject(refreshError);
+        } finally {
+          isRefreshing = false;
+        }
+      },
+    );
+
     (async function () {
       dispatch(setIsLoading(true));
       await checkAuth();
       dispatch(setIsLoading(false));
     })();
+
+    return () => {
+      axios.interceptors.request.eject(requestInterceptor);
+      axios.interceptors.response.eject(responseInterceptor);
+    };
   }, []);
-
-  const checkAuth = async (isRetry = false) => {
-    try {
-      const accessToken = Cookies.get("accessToken");
-      if (!accessToken) return refreshToken();
-
-      const res = await axios.get(DB_URL + "/user/isAuthenticated", {
-        headers: {
-          Authorization: accessToken,
-        },
-      });
-
-      if (res.data?.success) {
-        dispatch(setIsAuthenticated(true));
-        dispatch(setAccessToken(accessToken));
-        dispatch(setUser(res?.data?.user));
-
-        localStorage.setItem("user", JSON.stringify(res.data?.user));
-      }
-    } catch (error) {
-      if (error.response && error.response.status == 401 && !isRetry) {
-        return await refreshToken();
-      }
-      console.log(error.message);
-    }
-  };
-
-  const refreshToken = async () => {
-    try {
-      const res = await axios.get(DB_URL + "/user/refresh-token", {
-        withCredentials: true,
-      });
-
-      if (res.data.success) {
-        dispatch(setAccessToken(res?.data?.accessToken));
-        const expire_minutes_15 = new Date(
-          new Date().getTime() + 15 * 60 * 1000,
-        );
-
-        Cookies.set("accessToken", res?.data?.accessToken, {
-          expires: expire_minutes_15,
-        });
-
-        return await checkAuth(true);
-      }
-    } catch (error) {
-      if (error.response && error.response.status == 401) {
-        return await handleLogOut();
-      }
-      console.log(error.message);
-    }
-  };
-
-  const handleLogOut = async () => {
-    try {
-      const res = await axios.get(DB_URL + "/user/logout", {
-        withCredentials: true,
-      });
-
-      localStorage.clear("user");
-      Cookies.remove("accessToken");
-
-      // navigate("/");
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
 
   return (
     <>

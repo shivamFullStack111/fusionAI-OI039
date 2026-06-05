@@ -10,6 +10,8 @@ import {
   generateEmbedingsofMessage,
   isSubscribed_function,
 } from "../utils/functions.js";
+import { Chatbot } from "../schemas/chatbot.schema.js";
+import { getWorkspaceUserId } from "../utils/workspace.js";
 
 export const sendMessage = async (req, res) => {
   try {
@@ -244,6 +246,18 @@ export const sendMessageBySupport = async (req, res) => {
         message: "Conversation not found",
       });
     }
+    const chatbot = await Chatbot.findOne({
+      _id: conversation.chatbotId,
+      userId: getWorkspaceUserId(req.user),
+    });
+
+    if (!chatbot) {
+      return res.status(403).send({
+        success: false,
+        message: "You cannot respond to this conversation",
+      });
+    }
+
     if (!conversation?.isTicketRaised) {
       return res.send({
         success: false,

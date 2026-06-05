@@ -1,4 +1,5 @@
 import { Section } from "../schemas/section.schema.js";
+import { denyMemberAction, getWorkspaceUserId } from "../utils/workspace.js";
 
 export const createSection = async (req, res) => {
   try {
@@ -13,8 +14,12 @@ export const createSection = async (req, res) => {
     }
 
     const { sectionName = "", knowledgeSourceIds = [], tone = "" } = req?.body;
+    const workspaceUserId = getWorkspaceUserId(req.user);
 
-    const section = await Section.findOne({ sectionName });
+    const section = await Section.findOne({
+      sectionName,
+      userId: workspaceUserId,
+    });
 
     if (section)
       return res.send({
@@ -37,7 +42,7 @@ export const createSection = async (req, res) => {
     }
 
     const newSection = new Section({
-      userId: req?.user?._id,
+      userId: workspaceUserId,
       sectionName,
       description: req?.body?.description || "",
       knowledgeSourceIds,
@@ -60,7 +65,7 @@ export const createSection = async (req, res) => {
 
 export const getAllSection = async (req, res) => {
   try {
-    const sections = await Section.find({ userId: req?.user?._id })
+    const sections = await Section.find({ userId: getWorkspaceUserId(req.user) })
       .populate("knowledgeSourceIds")
       .sort({ createdAt: -1 });
 
@@ -113,7 +118,7 @@ export const updateSection = async (req, res) => {
 
     const section = await Section.findOneAndUpdate(
       {
-        userId: req?.user?._id,
+        userId: getWorkspaceUserId(req.user),
         _id: req?.body?.sectionId,
       },
       { $set: dataThatChange },
@@ -128,11 +133,16 @@ export const updateSection = async (req, res) => {
 
 export const deleteSection = async (req, res) => {
   try {
+    if (denyMemberAction(req, res, "delete sections")) return;
+
     if (!req.body?.sectionId) {
       return res.send({ success: false, message: "Section id is required" });
     }
 
-    await Section.findOneAndDelete({ _id: req?.body?.sectionId });
+    await Section.findOneAndDelete({
+      _id: req?.body?.sectionId,
+      userId: getWorkspaceUserId(req.user),
+    });
 
     return res.send({ success: true, message: "Section deleted" });
   } catch (error) {

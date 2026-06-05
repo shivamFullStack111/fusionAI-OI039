@@ -1,9 +1,12 @@
 import { Chatbot } from "../schemas/chatbot.schema.js";
 import { Conversation } from "../schemas/conversation.schema.js";
+import { getWorkspaceUserId } from "../utils/workspace.js";
 
 export const getAllConversations = async (req, res) => {
   try {
-    const chatbot = await Chatbot.findOne({ userId: req?.user?._id });
+    const chatbot = await Chatbot.findOne({
+      userId: getWorkspaceUserId(req.user),
+    });
     console.log(chatbot);
     if (!chatbot) {
       return res.send({ success: false, message: "Chatbot not found" });
@@ -96,7 +99,9 @@ export const resolveTicketConversation = async (req, res) => {
       return res.send({ success: false, message: "conversation not found" });
     }
 
-    const chatbot = await Chatbot.findOne({ userId: req?.user?._id });
+    const chatbot = await Chatbot.findOne({
+      userId: getWorkspaceUserId(req.user),
+    });
 
     if (!chatbot)
       return res.send({
