@@ -46,6 +46,7 @@ export const submitReview = async (req, res) => {
   try {
     const { conversationId } = req.body;
     const { ratings, message } = req.body;
+
     if (!conversationId) {
       return res.send({
         success: false,
@@ -73,6 +74,48 @@ export const submitReview = async (req, res) => {
     return res.send({
       success: true,
       message: "Review submitted successfully",
+    });
+  } catch (error) {
+    return res.send({ success: false, message: error.message });
+  }
+};
+
+export const resolveTicketConversation = async (req, res) => {
+  try {
+    const { conversationId } = req.body;
+
+    if (!conversationId)
+      return res.send({
+        success: false,
+        message: "Conversation id is required",
+      });
+
+    const conversation = await Conversation.findOne({ _id: conversationId });
+
+    if (!conversation) {
+      return res.send({ success: false, message: "conversation not found" });
+    }
+
+    const chatbot = await Chatbot.findOne({ userId: req?.user?._id });
+
+    if (!chatbot)
+      return res.send({
+        success: false,
+        message: "chatbot not found",
+      });
+
+    if (chatbot?._id?.toString() !== conversation?.chatbotId?.toString()) {
+      return res.send({ success: false, message: "You cannot mark resolved" });
+    }
+
+    conversation.ticketResolved = true;
+    conversation.isEnded = true;
+
+    await conversation.save();
+
+    return res.send({
+      success: true,
+      message: "Conversation resolved and Ended",
     });
   } catch (error) {
     return res.send({ success: false, message: error.message });

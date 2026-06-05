@@ -97,17 +97,18 @@ const Conversations = () => {
         { headers: { Authorization: accessToken } },
       );
 
-      if (res.data.success) {
+      if (res.data?.success) {
         setSelectedConversation({
           ...selectedConversation,
-          ticketRaised: false,
           ticketResolved: true,
         });
         toast.success("Ticket resolved!");
+      } else {
+        toast.error(res?.data?.message || "Failed to resolve ticket");
       }
     } catch (error) {
       console.error(error);
-      toast.error("Failed to resolve ticket");
+      toast.error(error.message || "Failed to resolve ticket");
     }
   };
 
@@ -261,11 +262,10 @@ const Conversations = () => {
                   Conversation ID: {selectedConversation?._id?.slice(-8)}
                 </p>
               </div>
-
               {/* Ticket Status & Actions */}
               {selectedConversation && (
                 <div>
-                  {selectedConversation?.ticketRaised &&
+                  {selectedConversation?.isTicketRaised &&
                     !selectedConversation?.ticketResolved && (
                       <div className="flex items-center gap-3">
                         <span className="text-xs bg-yellow-600/20 text-yellow-500 px-3 py-1.5 rounded-full flex items-center gap-2">
@@ -319,6 +319,16 @@ const Conversations = () => {
               <div className="text-center text-zinc-600 text-sm py-3">
                 Select a conversation to view messages
               </div>
+            ) : selectedConversation?.isResolved ? (
+              <div className="text-center text-green-600/70 text-sm py-3 bg-green-600/5 rounded-lg border border-green-600/20">
+                <CheckCircle size={16} className="inline mr-2" />
+                This ticket has been resolved. Cannot send more messages.
+              </div>
+            ) : selectedConversation?.isEnded ? (
+              <div className="text-center text-green-600/70 text-sm py-3 bg-green-600/5 rounded-lg border border-green-600/20">
+                <CheckCircle size={16} className="inline mr-2" />
+                This Conversation is Ended
+              </div>
             ) : selectedConversation.isTicketRaised &&
               !selectedConversation.ticketResolved ? (
               <div className="flex gap-3">
@@ -327,7 +337,7 @@ const Conversations = () => {
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyDown={handleKeyPress}
                   placeholder="Type your response to the user..."
-                  className="min-h-[60px] max-h-[120px] resize-none bg-zinc-900 border-zinc-800 text-zinc-300 placeholder:text-zinc-600"
+                  className="min-h-15 max-h-30 resize-none bg-zinc-900 border-zinc-800 text-zinc-300 placeholder:text-zinc-600"
                   rows={2}
                 />
                 <Button
@@ -380,7 +390,9 @@ const MessageBubble = ({ message }) => {
             : "bg-blue-600 text-white rounded-br-sm"
         }`}
       >
-        <p className="whitespace-pre-wrap wrap-break-words">{message.content}</p>
+        <p className="whitespace-pre-wrap wrap-break-words">
+          {message.content}
+        </p>
         <p
           className={`text-[10px] mt-1 ${isAi ? "text-zinc-600" : "text-blue-200/70"}`}
         >

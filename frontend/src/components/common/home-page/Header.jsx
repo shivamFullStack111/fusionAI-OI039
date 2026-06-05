@@ -15,7 +15,7 @@ const Header = () => {
         <div className="flex gap-2  items-center justify-center">
           <img
             className="h-12 w-12 object-cover p-1 rounded-full border-2 border-gray-300 "
-            src="icons/logo.png"
+            src="https://res.cloudinary.com/dosyxpa1r/image/upload/v1779451314/logo_bbzx0w.png"
             alt=""
           />
           <p className="font-semibold">FusionAI</p>

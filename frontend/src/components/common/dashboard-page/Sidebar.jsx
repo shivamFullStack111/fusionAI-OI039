@@ -10,17 +10,17 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 const Sidebar = () => {
-  // get current path 
+  // get current path
   const currentPath = window.location.pathname;
 
-  console.log(currentPath)
+  console.log(currentPath);
 
   return (
     <div className="h-full overflow-y-auto  flex flex-col border-r w-70">
       <Link to={"/"} className="flex gap-2  items-center  p-3 border-b">
         <img
           className="h-7 w-7 object-cover p-1 rounded-full border-2 border-gray-300 "
-          src="icons/logo.png"
+          src="https://res.cloudinary.com/dosyxpa1r/image/upload/v1779451314/logo_bbzx0w.png"
           alt=""
         />
         <p className="font-semibold">FusionAI</p>

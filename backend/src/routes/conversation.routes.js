@@ -8,7 +8,7 @@ import {
 import { authMiddleware } from "../middleware/auth.middleware.js";
 import { isSubscribed } from "../middleware/isSubscribed.middleware.js";
 import { upload } from "../middleware/multer.middleware.js";
-import { getAllConversations, getExternalUserAllConversations, submitReview } from "../controllers/conversation.controller.js";
+import { getAllConversations, getExternalUserAllConversations, resolveTicketConversation, submitReview } from "../controllers/conversation.controller.js";
 
 const conversationRoutes = express.Router();
 
@@ -19,5 +19,7 @@ conversationRoutes.post(
 );
 conversationRoutes.post("/submit-review", authMiddleware, submitReview);
 conversationRoutes.post("/get-external-user-all-conversations", getExternalUserAllConversations);
+conversationRoutes.post("/get-external-user-all-conversations", getExternalUserAllConversations);
+conversationRoutes.post("/resolve-ticket",authMiddleware ,resolveTicketConversation);
 
 export default conversationRoutes;
