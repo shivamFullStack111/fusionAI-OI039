@@ -61,6 +61,8 @@ const server = http.createServer(app);
 const io = initializeSocket(server);
 
 // server listeningp--
-server.listen(7474, "0.0.0.0", () => {
-  console.log("Server running on port 7474");
+let port = process.env.PORT || 7474
+
+server.listen(port, "0.0.0.0", () => {
+  console.log(`Server running on port ${port}`);
 });
