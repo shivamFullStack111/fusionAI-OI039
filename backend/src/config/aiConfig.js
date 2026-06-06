@@ -1,5 +1,4 @@
 import { ChatMistralAI } from "@langchain/mistralai";
-import { HuggingFaceInferenceEmbeddings } from "@langchain/community/embeddings/hf";
 import { CohereEmbeddings } from "@langchain/cohere";
 
 import dotenv from "dotenv";
