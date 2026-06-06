@@ -3,5 +3,5 @@ export const isInProduction = import.meta.env.VITE_API_URL ? true : false;
 
 // export const DB_URL = '/api';
 export const DB_URL = isInProduction
-  ? "https://fusionai-oi039.onrender.com/api"
+  ? "https://fusion-ai-4wqa.onrender.com/api"
   : "http://localhost:7474/api";
