@@ -52,7 +52,7 @@ const Code_embed_box = ({ showCopyButton, width }) => {
               <CopyIcon
                 onClick={async () => {
                   await navigator.clipboard.writeText(
-                    `<script \n src="${isInProduction ? "https://aai-agent-saas-bay.vercel.app/embed.js" : "http://localhost:5173/embed.js"}" \n data-external-user-id="unique-user-id" \n data-bot-id="${chatbot?._id || "your-chatbot-id"}"  >\n</script>`,
+                    `<script \n src="${isInProduction ? "https://fusion-ai-zeta.vercel.app/embed.js" : "http://localhost:5173/embed.js"}" \n data-external-user-id="unique-user-id" \n data-bot-id="${chatbot?._id || "your-chatbot-id"}"  >\n</script>`,
                   );
                   toast.success("Copied!");
                 }}
@@ -73,7 +73,7 @@ const Code_embed_box = ({ showCopyButton, width }) => {
               style: { background: "transparent" },
             }}
           >
-            {`<script \n src="${isInProduction ? "https://aai-agent-saas-bay.vercel.app/embed.js" : "http://localhost:5173/embed.js"}" \n data-external-user-id="unique-user-id" \n data-bot-id="${chatbot?._id || "your-chatbot-id"}"  >\n</script>`}
+            {`<script \n src="${isInProduction ? "https://fusion-ai-zeta.vercel.app/embed.js" : "http://localhost:5173/embed.js"}" \n data-external-user-id="unique-user-id" \n data-bot-id="${chatbot?._id || "your-chatbot-id"}"  >\n</script>`}
           </SyntaxHighlighter>
         </div>
       )}

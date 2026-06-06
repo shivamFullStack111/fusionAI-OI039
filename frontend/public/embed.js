@@ -21,7 +21,7 @@
   // bot id is required else show error
   if (botId) {
     iframe.src = `http://localhost:5173/chatbot?user_id=${userId}&bot_id=${botId}`;
-    // iframe.src = `https://ai-agent-saas-bay.vercel.app/chatbot?bot_id=${botId}`;
+    // iframe.src = `https://fusion-ai-zeta.vercel.app/chatbot?bot_id=${botId}`;
 
     iframe.style.borderRadius = "50%";
     iframe.style.width = "53px";
