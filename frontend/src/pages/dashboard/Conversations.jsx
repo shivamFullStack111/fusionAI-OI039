@@ -102,6 +102,20 @@ const Conversations = () => {
           ...selectedConversation,
           ticketResolved: true,
         });
+
+        setAllConversations((prev) => {
+          return prev.map((con) => {
+            if (con?._id == selectedConversation?._id) {
+              return {
+                ...con,
+                ticketResolved: true,
+              };
+            } else {
+              return con;
+            }
+          });
+        });
+
         toast.success("Ticket resolved!");
       } else {
         toast.error(res?.data?.message || "Failed to resolve ticket");

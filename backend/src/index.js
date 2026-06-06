@@ -11,6 +11,7 @@ import sectionRoutes from "./routes/section.routes.js";
 import chatbotRoutes from "./routes/chatbot.routes.js";
 import messageRoutes from "./routes/message.routes.js";
 import conversationRoutes from "./routes/conversation.routes.js";
+import workspaceRoutes from "./routes/workspace.routes.js";
 import http from "http";
 import { Server } from "socket.io";
 import { initializeSocket } from "./config/initializeSocket.js";
@@ -47,6 +48,7 @@ app.use("/api/knowledge", knowledgeRoutes);
 app.use("/api/section", sectionRoutes);
 app.use("/api/chatbot", chatbotRoutes);
 app.use("/api/conversation", conversationRoutes);
+app.use("/api/workspace", workspaceRoutes);
 
 // health -
 app.get("/", (req, res) => {

@@ -93,31 +93,36 @@ export const sendMessage = async (req, res) => {
 
       const last8Message = req?.body?.allMessages?.slice(-8);
 
-      // ask from ai to select sections according user question
+      // ask AI to select the most relevant sections for the user question
       let selectedSectionNames = await findSectionsForUserMessage(
         req?.body?.message,
         req?.body?.sections,
         last8Message,
       );
 
-      // filter sections from req.body.section that section names provided by ai  and get knowledgeIds from selected sections
-
+      // filter sections from req.body.sections that AI selected and gather section data
       let selectedSections = [];
 
-      if (selectedSectionNames?.length)
+      if (selectedSectionNames?.length) {
         selectedSections = req.body?.sections?.filter((s) =>
           selectedSectionNames.includes(s.sectionName),
         );
+      }
+
+      if (!selectedSections?.length) {
+        selectedSections = req.body?.sections || [];
+      }
 
       let knowledgeIdsAndOtherRequiredInfo = [];
       if (selectedSections?.length)
         knowledgeIdsAndOtherRequiredInfo = selectedSections?.map((section) => {
           return section?.knowledgeSourceIds?.map((k) => {
             return {
-              knowledgeId: k?._id,
+              knowledgeId: k?._id?.toString(),
               tone: section?.tone,
               allowedTopics: section?.allowedTopics,
               blockedTopics: section?.blockedTopics,
+              sectionName: section?.sectionName,
             };
           });
         });
@@ -142,15 +147,18 @@ export const sendMessage = async (req, res) => {
               k?.tone,
               k?.allowedTopics,
               k?.blockedTopics,
+              null,
+              k?.sectionName,
             ),
           ),
         );
 
-      // // provide last 8 messages and relevent data from cromaDB and call ai for final result
+      const preferredTone = selectedSections?.[0]?.tone || "friendly";
       const content = await generateAiResponse(
         req?.body?.message,
         releventData,
         last8Message,
+        preferredTone,
       );
 
       const newMessageUser = new Message({
@@ -177,7 +185,7 @@ export const sendMessage = async (req, res) => {
           },
         );
       }
-      if (content == "Raise a ticket") {
+      if (content == "Ticket Raised!") {
         await Conversation.findOneAndUpdate(
           {
             _id: req?.body?.conversationId,

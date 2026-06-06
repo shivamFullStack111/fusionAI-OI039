@@ -7,9 +7,11 @@ import {
   Settings,
 } from "lucide-react";
 import React from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 const Sidebar = () => {
+  const { user } = useSelector((state) => state.auth);
   // get current path
   const currentPath = window.location.pathname;
 
@@ -77,12 +79,12 @@ const Sidebar = () => {
       </div>
 
       <div className="mt-auto p-4 flex gap-3">
-        <p className="bg-zinc-900 text-zinc-600 text-lg rounded-full h-9 w-9 justify-center items-center flex">
-          s
+        <p className="bg-zinc-900 text-zinc-600 text-lg rounded-full min-h-9 max-h-9 max-w-9 min-w-9 justify-center items-center flex">
+          {user?.name?.charAt(0).toUpperCase() || "U"}
         </p>
         <div>
-          <p className="text-sm font-semibold">Shivam Org.</p>
-          <p className="text-xs text-zinc-700 ">shivam@gmail.com</p>
+          <p className="text-sm font-semibold">{user?.name || "User"}</p>
+          <p className="text-xs text-zinc-700 ">{user?.email || ""}</p>
         </div>
       </div>
     </div>

@@ -1,11 +1,9 @@
-import Code_embed_box from "@/components/common/Code_embed_box";
-import Chatbot_playground from "@/components/common/dashboard-page/Chatbot_playground";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Code, Info, Palette, Plus, Save } from "lucide-react";
+import { Plus, Save, Trash2, Settings as SettingsIcon } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -65,13 +63,94 @@ const Settings = () => {
 
 export default Settings;
 
+// ========== WORKSPACE SETTINGS COMPONENT ==========
 const WorkspaceSettings = () => {
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [formData, setFormData] = useState({
+    workspaceName: "",
+    primaryWebsite: "",
+    defaultLanguage: "en",
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  });
+
+  useEffect(() => {
+    fetchWorkspace();
+  }, []);
+
+  const fetchWorkspace = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.post(
+        `${DB_URL}/workspace/get`,
+        {},
+        {
+          headers: { Authorization: Cookies.get("accessToken") },
+        },
+      );
+
+      if (res?.data?.success) {
+        setFormData({
+          workspaceName: res?.data?.workspace?.workspaceName || "",
+          primaryWebsite: res?.data?.workspace?.primaryWebsite || "",
+          defaultLanguage: res?.data?.workspace?.defaultLanguage || "en",
+          timezone:
+            res?.data?.workspace?.timezone ||
+            Intl.DateTimeFormat().resolvedOptions().timeZone,
+        });
+      } else {
+        toast.error(res?.data?.message);
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      const res = await axios.post(`${DB_URL}/workspace/update`, formData, {
+        headers: { Authorization: Cookies.get("accessToken") },
+      });
+
+      if (res?.data?.success) {
+        toast.success("Workspace updated successfully!");
+      } else {
+        toast.error(res?.data?.message);
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="rounded-lg bg-zinc-950 p-4">
+        <div className="h-32 bg-zinc-900 animate-pulse rounded-lg" />
+      </div>
+    );
+  }
+
   return (
-    <div className="rounded-lg  bg-zinc-950 p-4 ">
+    <div className="rounded-lg bg-zinc-950 p-4 mb-5">
       <div>
-        <p className="text-zinc-300">Workspace Settings</p>
+        <p className="text-zinc-300 flex items-center gap-2">
+          <SettingsIcon size={18} /> Workspace Settings
+        </p>
         <p className="text-sm text-zinc-600">
-          General settings for your organzation, (Read only)
+          Configure general settings for your organization
         </p>
 
         <div className="mt-6 grid gap-4 grid-cols-2">
@@ -83,7 +162,10 @@ const WorkspaceSettings = () => {
               className={"mt-2 h-10"}
               id="workspace-name"
               type="text"
+              name="workspaceName"
               placeholder="Your workspace name"
+              value={formData.workspaceName}
+              onChange={handleInputChange}
             />
           </div>
           <div>
@@ -93,20 +175,36 @@ const WorkspaceSettings = () => {
             <Input
               className={"mt-2 h-10"}
               id="primary-website"
-              type="text"
-              placeholder="Your primary website"
+              type="url"
+              name="primaryWebsite"
+              placeholder="https://example.com"
+              value={formData.primaryWebsite}
+              onChange={handleInputChange}
             />
           </div>
           <div>
             <FieldLabel className={"text-zinc-400"} htmlFor="language">
               Default Language
             </FieldLabel>
-            <Input
-              className={"mt-2 h-10"}
+            <select
+              className={
+                "mt-2 h-10 w-full bg-zinc-900 border border-zinc-700 rounded px-3 text-zinc-300"
+              }
               id="language"
-              type="text"
-              placeholder="Your primary language"
-            />
+              name="defaultLanguage"
+              value={formData.defaultLanguage}
+              onChange={handleInputChange}
+            >
+              <option value="en">English</option>
+              <option value="es">Spanish</option>
+              <option value="fr">French</option>
+              <option value="de">German</option>
+              <option value="it">Italian</option>
+              <option value="pt">Portuguese</option>
+              <option value="ja">Japanese</option>
+              <option value="zh">Chinese</option>
+              <option value="hi">Hindi</option>
+            </select>
           </div>
           <div>
             <FieldLabel className={"text-zinc-400"} htmlFor="timezone">
@@ -116,11 +214,18 @@ const WorkspaceSettings = () => {
               className={"mt-2 h-10"}
               id="timezone"
               type="text"
+              name="timezone"
               placeholder="your timezone"
-              defaultValue={Intl.DateTimeFormat().resolvedOptions().timeZone}
+              value={formData.timezone}
+              onChange={handleInputChange}
             />
           </div>
         </div>
+
+        <Button onClick={handleSave} disabled={saving} className="mt-6 w-full">
+          <Save size={16} className="mr-2" />
+          {saving ? "Saving..." : "Save Workspace Settings"}
+        </Button>
       </div>
     </div>
   );
@@ -212,7 +317,7 @@ const TeamMembers = () => {
             <p className="text-zinc-300 text-lg font-medium">Team Members</p>
 
             <p className="text-sm text-zinc-600">
-              General settings for your organization.
+              Manage your team and workspace members.
             </p>
           </div>
 
@@ -355,13 +460,9 @@ const AddUserDialog = ({ setAllMembers, allMembers }) => {
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
   const [open, setOpen] = useState(false);
-  const { user } = useSelector((state) => state.auth);
-
-  const [isLoading, setisLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setisLoading(true);
     try {
       const accessToken = Cookies.get("accessToken");
       const res = await axios.post(
@@ -380,7 +481,7 @@ const AddUserDialog = ({ setAllMembers, allMembers }) => {
       );
       if (res?.data?.success) {
         toast.success(res?.data?.message);
-        setAllMembers((prev) => [res?.data?.member, ...allMembers]);
+        setAllMembers([res?.data?.member, ...allMembers]);
         setname("");
         setemail("");
         setpassword("");
@@ -391,8 +492,6 @@ const AddUserDialog = ({ setAllMembers, allMembers }) => {
       }
     } catch (error) {
       toast.error(error.message);
-    } finally {
-      setisLoading(false);
     }
   };
   return (

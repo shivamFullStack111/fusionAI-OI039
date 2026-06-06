@@ -112,8 +112,8 @@ const ChatbotUI = () => {
 
     const userMessage = { role: "user", content: text };
     setAllMessages((prev) => [...prev, userMessage]);
-    if (!conversation?.isTicketRaised) setIsTyping(true) 
-      else setIsTyping(false);
+    if (!conversation?.isTicketRaised) setIsTyping(true);
+    else setIsTyping(false);
 
     try {
       const res = await axios.post(DB_URL + "/message/send-message", {
@@ -141,6 +141,7 @@ const ChatbotUI = () => {
         }
 
         if (res?.data?.conversationWithTicketRaised) {
+          // do nothing
         } else {
           const aiMessage = {
             role: "ai",
@@ -150,7 +151,7 @@ const ChatbotUI = () => {
           if (res?.data?.aiMessage?.content == "Conversation Ended") {
             setConversation((p) => ({ ...p, isEnded: true }));
           }
-          if (res?.data?.aiMessage?.content == "Raise a ticket") {
+          if (res?.data?.aiMessage?.content == "Ticket Raised!") {
             toast.success(
               "A support ticket has been raised. Our team will get back to you soon.",
             );
