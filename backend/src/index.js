@@ -15,6 +15,8 @@ import workspaceRoutes from "./routes/workspace.routes.js";
 import http from "http";
 import { Server } from "socket.io";
 import { initializeSocket } from "./config/initializeSocket.js";
+import axios from "axios";
+import cron from "node-cron";
 
 // configs
 dotenv.config();
@@ -23,12 +25,24 @@ const app = express();
 
 connectDB();
 
-const origin = process.env.FRONTEND_URL || "http://localhost:5173";
+const origins = [process.env.FRONTEND_URL || "http://localhost:5173" ];
+
+const backend_URL = process.env.BACKEND_URL || "http://localhost:7474";
+
+cron.schedule("*/15 * * * *", async () => {
+  try {
+    const res = await axios.get(backend_URL);
+
+    console.log(`[${new Date().toISOString()}] Ping successful`, res.status);
+  } catch (error) {
+    console.error(`[${new Date().toISOString()}] Ping failed`, error.message);
+  }
+});
 
 // middlewares
 app.use(
   cors({
-    origin: origin, // React ka exact URL
+    origin: origins, // React ka exact URL
     credentials: true, // ← YEH ZAROORI HAI
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -61,7 +75,7 @@ const server = http.createServer(app);
 const io = initializeSocket(server);
 
 // server listeningp--
-let port = process.env.PORT || 7474
+let port = process.env.PORT || 7474;
 
 server.listen(port, "0.0.0.0", () => {
   console.log(`Server running on port ${port}`);
