@@ -11,7 +11,7 @@
   iframe.style.right = "20px";
   iframe.style.border = "none";
   iframe.style.zIndex = "9999";
-  iframe.style.border = "2px solid black";
+  iframe.style.border = "1px solid black";
   iframe.style.display = "flex";
   iframe.style.justifyContent = "center";
   iframe.style.alignItems = "center";
@@ -24,8 +24,8 @@
     // iframe.src = `https://fusion-ai-zeta.vercel.app/chatbot?bot_id=${botId}`;
 
     iframe.style.borderRadius = "50%";
-    iframe.style.width = "53px";
-    iframe.style.height = "52px";
+    iframe.style.width = "55px";
+    iframe.style.height = "55px";
   } else {
     iframe.style.width = "220px";
     iframe.style.height = "45px";
@@ -46,10 +46,10 @@
     }
     if (e.data == "widget:close") {
       Object.assign(iframe.style, {
-        width: "53px",
-        height: "52px",
+        width: "55px",
+        height: "55px",
         borderRadius: "100px",
-        border: "2px solid black",
+        border: "1px solid black",
       });
     }
   });

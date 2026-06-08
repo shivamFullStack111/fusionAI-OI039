@@ -268,7 +268,7 @@ const ChatbotUI = () => {
 const ChatButton = ({ onClick, primaryColor }) => (
   <button
     onClick={onClick}
-    className="group flex cursor-pointer mt-auto ml-auto w-[48px] h-[48px] items-center justify-center rounded-full shadow-lg  transition-all duration-300"
+    className="group flex cursor-pointer   w-[55px] h-[55px] items-center justify-center rounded-full shadow-lg  transition-all duration-300"
     style={{ backgroundColor: primaryColor }}
   >
     <MessageCircle size={24} className="text-white" />
@@ -345,6 +345,18 @@ const ChatWindow = ({
     setTimeout(() => setVisibleMessages(newIds), 50);
   }, [messages]);
 
+
+
+
+    const chatContainerRef = useRef(null);
+    useEffect(() => {
+    const container = chatContainerRef.current;
+
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
+  }, [messages]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!input.trim()) return;
@@ -419,7 +431,7 @@ const ChatWindow = ({
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10">
+      <div ref={chatContainerRef} className="flex-1 scroll-smooth overflow-y-auto px-4 py-4 flex flex-col gap-3 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10">
         {messages && messages?.length === 0 && (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
@@ -433,18 +445,17 @@ const ChatWindow = ({
           </div>
         )}
         {messages &&
-          messages?.map((msg, idx) => (
+          messages?.map((msg) => (
             <MessageBubble
               setConversation={setConversation}
               message={msg}
-              isVisible={visibleMessages.has(idx)}
               primaryColor={primaryColor}
               conversation={conversation}
             />
           ))}
 
         {isTyping && <TypingIndicator primaryColor={primaryColor} />}
-        <div ref={messagesEndRef} />
+        {/* <div className="h-0 w-0" ref={messagesEndRef} /> */}
       </div>
 
       {/* Input & Branding */}
@@ -618,7 +629,7 @@ const SidebarOfUserConversations = ({
       <p className="border-b h-1"></p>
       <div className="p-3">
         <h2 className="text-sm font-semibold   text-gray-400">Conversations</h2>
-        <div className="flex mt-3 flex-col">
+        <div className="flex overflow-auto  h-108 mt-3 flex-col">
           {userAllConversations?.map((con, i) => (
             <div
               onClick={() => {
@@ -649,7 +660,6 @@ import { current } from "@reduxjs/toolkit";
 
 const MessageBubble = ({
   message,
-  isVisible,
   primaryColor,
   conversation,
   onReviewSubmitted,
@@ -718,9 +728,7 @@ const MessageBubble = ({
 
   return (
     <div
-      className={`flex gap-2.5 ${isAi ? "justify-start" : "justify-end"} transition-all duration-300 ${
-        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
-      }`}
+      className={`flex gap-2.5 ${isAi ? "justify-start" : "justify-end"} transition-all duration-300 `}
     >
       {isConversationEnded && !conversation?.review?.ratings && (
         <div className="w-full max-w-md mx-auto my-4">
