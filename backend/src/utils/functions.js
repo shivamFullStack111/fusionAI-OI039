@@ -8,6 +8,7 @@ import mammoth from "mammoth";
 import WordExtractor from "word-extractor";
 import Cookies from "js-cookie";
 import { Subscription } from "../schemas/subscription.schema.js";
+import { Conversation } from "../schemas/conversation.schema.js";
 
 export const setRefreshTokenCookies = (res, refreshToken) => {
   try {
@@ -231,7 +232,6 @@ export const isSubscribed_function = async (req, res, userId) => {
       .sort({ createdAt: -1 })
       .populate("planId");
 
-
     if (!userCurrentPlan) throw new Error("You have to purchase plan");
 
     // return res.send({ success: false, message: "You have to purchase plan" });
@@ -251,6 +251,18 @@ export const isSubscribed_function = async (req, res, userId) => {
     return userCurrentPlan;
   } catch (error) {
     // return res.send({ success: false, message: error.message });
+    throw new Error(error.message);
+  }
+};
+
+export const update_updatedAt_of_conversation = async (conversationId) => {
+  try {
+    const conversation = await Conversation.findOneAndUpdate(
+      { _id: conversationId },
+      { $set: { updatedAt: new Date() } },
+    );
+    return;
+  } catch (error) {
     throw new Error(error.message);
   }
 };

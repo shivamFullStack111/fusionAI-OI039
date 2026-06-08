@@ -9,6 +9,7 @@ import {
 import {
   generateEmbedingsofMessage,
   isSubscribed_function,
+  update_updatedAt_of_conversation,
 } from "../utils/functions.js";
 import { Chatbot } from "../schemas/chatbot.schema.js";
 import { getWorkspaceUserId } from "../utils/workspace.js";
@@ -200,6 +201,7 @@ export const sendMessage = async (req, res) => {
 
       await newMessageUser.save();
       await newMessageAi.save();
+      update_updatedAt_of_conversation(req?.body?.conversationId);
 
       return res.send({
         success: true,
@@ -221,6 +223,7 @@ export const sendMessage = async (req, res) => {
       });
 
       await newMessageUser.save();
+      update_updatedAt_of_conversation(req?.body?.conversationId);
 
       return res.send({
         success: true,
@@ -279,6 +282,7 @@ export const sendMessageBySupport = async (req, res) => {
       content: message,
     });
     await newMessageSupport.save();
+    update_updatedAt_of_conversation(conversationId)
 
     return res.send({
       success: true,
