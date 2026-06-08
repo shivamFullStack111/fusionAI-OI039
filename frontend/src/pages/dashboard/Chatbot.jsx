@@ -218,7 +218,7 @@ const EmbedCode = () => {
       </div>
       <div className="flex p-1 px-2 mt-3 rounded-lg border  border-yellow-600 text-xs text-yellow-600 gap-2 bg-[#ffea2d27] items-center ">
         <Info size={17} />{" "}
-        <p>Paste this code before the {`<head>`} closing tag. </p>
+        <p>Paste this code before the {`<body>`} closing tag. </p>
       </div>
     </div>
   );

@@ -29,7 +29,7 @@ const origins = [process.env.FRONTEND_URL || "http://localhost:5173" ];
 
 const backend_URL = process.env.BACKEND_URL || "http://localhost:7474";
 
-cron.schedule("*/15 * * * *", async () => {
+cron.schedule("*/8 * * * *", async () => {
   try {
     const res = await axios.get(backend_URL);
 

@@ -3,8 +3,12 @@ import Squares from "./Squares";
 import { Card } from "../../ui/card";
 import { Button } from "../../ui/button";
 import { ArrowRight } from "lucide-react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const Particle_screen = () => {
+  const { isAuthenticated } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
   return (
     <div className="relative">
       <div className="w-full  flex bg-transparent absolute  text-white z-50 mt-28 items-center flex-col ">
@@ -26,12 +30,38 @@ const Particle_screen = () => {
         </p>
 
         <div className="flex mt-8 justify-center items-center gap-6 ">
-          <Button className={"py-5 rounded-full px-5 cursor-pointer"}>
-            Start for free <ArrowRight />{" "}
-          </Button>
-          <Button variant="outline" className={"py-5 dark bg-black/40!  rounded-full px-5 cursor-pointer"}>
-            View Demo  {" "}
-          </Button>
+          {isAuthenticated && (
+            <Button
+              onClick={() => {
+                if (isAuthenticated) {
+                  navigate("/dashboard");
+                }
+              }}
+              className={"py-5 rounded-full px-5 cursor-pointer"}
+            >
+              Dashboard <ArrowRight />{" "}
+            </Button>
+          )}
+
+          {!isAuthenticated && (
+            <a
+              href="#pricing"
+              className={
+                "px-3 text-black font-semibold gap-4 py-2 rounded-full bg-white flex justify-center items-center px-5 cursor-pointer"
+              }
+            >
+              Start for free <ArrowRight />{" "}
+            </a>
+          )}
+          <a
+            href="#integration"
+            className={
+              "px-3 text-white font-semibold gap-4 py-2 rounded-full  border border-zinc-900 flex justify-center items-center px-5 cursor-pointer"
+            }
+          >
+            Integration Steps
+            <ArrowRight />{" "}
+          </a>
         </div>
       </div>
       <Squares

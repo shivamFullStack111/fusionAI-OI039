@@ -13,7 +13,17 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { File, FileText, Globe, Info, Text, Upload } from "lucide-react";
+import {
+  Cross,
+  CrossIcon,
+  File,
+  FileText,
+  Globe,
+  Info,
+  Text,
+  Upload,
+  X,
+} from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import Loader from "../Loader";
@@ -65,7 +75,7 @@ function AddKnowledgeModal({ open, setopen, allKnowledges, setallKnowledges }) {
       }
 
       const res = await axios.post(
-       `${DB_URL}/knowledge/add-knowledge`,
+        `${DB_URL}/knowledge/add-knowledge`,
         formData,
         { headers: { Authorization: accessToken }, withCredentials: true },
       );
@@ -270,10 +280,13 @@ const TextTypeContent = ({
 const FileTypeContent = ({ handleAddKnowledge, loading, file, setfile }) => {
   const [isDragging, setisDragging] = useState(false);
   return (
-    <div className="my-4">
+    <div className="my-4 relative ">
+      {file && <X onClick={()=>{
+        setfile(null)
+      }} className="absolute hover:text-blue-500 cursor-pointer -top-3 -right-2"></X>}
       <label
         htmlFor="file"
-        className={`h-40 text-zinc-600 cursor-pointer w-full border-2 border-dashed rounded-xl border-zinc-700 flex justify-center items-center ${isDragging && " border-blue-700!  "} `}
+        className={`h-40 text-zinc-600  cursor-pointer w-full border-2 border-dashed rounded-xl border-zinc-700 flex justify-center items-center ${isDragging && " border-blue-700!  "} `}
       >
         <input
           onChange={(e) => {
