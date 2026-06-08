@@ -20,6 +20,8 @@ import Loader from "../common/Loader";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 
+console.log("ChatbotUI FILE LOADED");
+
 const ChatbotUI = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [params] = useSearchParams();
@@ -30,7 +32,6 @@ const ChatbotUI = () => {
   const [sections, setSections] = useState(null);
   const [conversation, setConversation] = useState(null);
   const [allMessages, setAllMessages] = useState([]);
-  const [userCurrentPlan, setuserCurrentPlan] = useState(null);
 
   const [currentConversationId, setcurrentConversationId] = useState("");
 
@@ -95,6 +96,43 @@ const ChatbotUI = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const external_userId = params.get("user_id");
+
+    if (!socket.connected) {
+      socket.connect();
+    }
+
+    socket.on("connect", () => {
+      console.log("Connected to Socket.io server with ID:", socket.id);
+      socket.emit("join-user", { userId: external_userId }); // this is external userId
+    });
+
+    return () => {
+      socket.off("connect");
+      socket.off("send-message-by-support");
+    };
+  }, []);
+
+  useEffect(() => {
+    socket.on("send-message-by-support", ({ message, conversationId }) => {
+      if (currentConversationId == conversationId) {
+        setAllMessages((prev) => [
+          ...prev,
+          {
+            role: "support",
+            conversationId,
+            content: message,
+          },
+        ]);
+      }
+    });
+
+    return () => {
+      socket.off("send-message-by-support");
+    };
+  }, [currentConversationId]);
+
   const handleOpen = () => {
     window.parent.postMessage("widget:open", "*");
     setTimeout(() => setIsOpen(true), 50);
@@ -116,6 +154,15 @@ const ChatbotUI = () => {
     else setIsTyping(false);
 
     try {
+      if (conversation?.isTicketRaised) {
+        socket.emit("send-message-by-user", {
+          conversationId: currentConversationId,
+          senderId: external_userId,
+          message: text,
+          chatbot,
+        });
+      }
+
       const res = await axios.post(DB_URL + "/message/send-message", {
         message: text,
         conversationId: conversation?._id,
@@ -164,7 +211,8 @@ const ChatbotUI = () => {
       } else {
         toast.error(res?.data?.message);
       }
-    } catch {
+    } catch (error) {
+      console.log(error);
       setAllMessages((prev) => [
         ...prev,
         {
@@ -489,7 +537,6 @@ const SidebarOfUserConversations = ({
           },
         );
 
-        console.log(res.data);
         if (res.data?.success) {
           setuserAllConversations(res.data.allConversations);
         } else {
@@ -597,6 +644,8 @@ const SidebarOfUserConversations = ({
 };
 
 import Cookies from "js-cookie";
+import { socket } from "@/App.jsx";
+import { current } from "@reduxjs/toolkit";
 
 const MessageBubble = ({
   message,

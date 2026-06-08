@@ -42,7 +42,7 @@
         borderRadius: "15px",
         border: "0px solid black",
       });
-      console.log("hbfhvbfhvbhfb");
+      // console.log("hbfhvbfhvbhfb");
     }
     if (e.data == "widget:close") {
       Object.assign(iframe.style, {

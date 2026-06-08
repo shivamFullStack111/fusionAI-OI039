@@ -86,11 +86,11 @@ export const sendMessage = async (req, res) => {
       conversation = await Conversation.findById(req?.body?.conversationId);
     }
 
-    if (!conversation?.isTicketRaised) {
-      // ===========================================================================================
-      // ------------------------------------IF TOKEN IS NOT RAISED---------------------------------
-      // ===========================================================================================
+    // ===========================================================================================
+    // ------------------------------------IF TOKEN IS NOT RAISED---------------------------------
+    // ===========================================================================================
 
+    if (!conversation?.isTicketRaised) {
       const last8Message = req?.body?.allMessages?.slice(-8);
 
       // ask AI to select the most relevant sections for the user question

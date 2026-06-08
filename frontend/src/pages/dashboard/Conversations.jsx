@@ -15,6 +15,8 @@ import Cookies from "js-cookie";
 import { useEffect, useState, useRef } from "react";
 import toast from "react-hot-toast";
 import { DB_URL } from "../../../utils/variables.js";
+import { useSelector } from "react-redux";
+import { socket } from "@/App.jsx";
 
 const Conversations = () => {
   const [allConversations, setAllConversations] = useState([]);
@@ -24,7 +26,54 @@ const Conversations = () => {
   const [isSending, setIsSending] = useState(false);
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [loadingConversations, setLoadingConversations] = useState(true);
+  const { user } = useSelector((state) => state.auth);
   const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    console.log(selectedConversation);
+  }, [selectedConversation]);
+
+  useEffect(() => {
+    if (!user?._id || !socket) return;
+    const userId = user?._id;
+
+    if (!socket.connected) {
+      socket.connect();
+    }
+
+    socket.on("connect", () => {
+      console.log("Connected to Socket.io server with ID:", socket.id);
+      socket.emit("join-user", { userId: userId }); // this is external userId
+    });
+
+    return () => {
+      socket.off("connect");
+    };
+  }, [socket, user?._id]);
+
+  useEffect(() => {
+    socket.on(
+      "send-message-by-user",
+      ({ conversationId, senderId, message, chatbot }) => {
+        console.log({ conversationId, senderId, message, chatbot });
+        console.log(conversationId, "selected con: ", selectedConversation);
+        if (conversationId == selectedConversation?._id)
+          setMessages((prev) => [
+            ...prev,
+            {
+              conversationId,
+              role: "user",
+              content: message,
+              createdAt: new Date(),
+            },
+          ]);
+      },
+    );
+
+    return () => {
+      socket.off("send-message-by-user");
+    };
+  });
 
   // Auto scroll to bottom
   useEffect(() => {
@@ -145,9 +194,17 @@ const Conversations = () => {
       content: messageToSend,
       createdAt: new Date(),
     };
+
     setMessages((prev) => [...prev, tempMessage]);
 
     try {
+      // send message to customer using socket
+      socket.emit("send-message-by-support", {
+        message: messageToSend,
+        conversationId: selectedConversation?._id,
+        receiverId:selectedConversation?.externaluserId
+      });
+
       const accessToken = Cookies.get("accessToken");
       const res = await axios.post(
         DB_URL + "/message/send-message-by-support", // SUPPORT is for admin and their users responses after ticket is raised

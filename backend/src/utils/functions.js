@@ -150,7 +150,7 @@ export const generateEmbedingsOfChunks = async (
 export const generateEmbedingsofMessage = async (message) => {
   try {
     const result = await embeddingsGenerator.embedQuery(message);
-    console.log(result);
+    // console.log(result);
     return result;
   } catch (error) {
     throw new Error(error.message);

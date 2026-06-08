@@ -201,7 +201,7 @@ export const getAllKnowledge = async (req, res) => {
       };
     }
 
-    console.log(conditions);
+    // console.log(conditions);
 
     const knowledges = await Knowledge.find({
       userId: getWorkspaceUserId(req.user),

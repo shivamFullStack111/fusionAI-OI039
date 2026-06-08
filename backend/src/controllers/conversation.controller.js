@@ -7,7 +7,7 @@ export const getAllConversations = async (req, res) => {
     const chatbot = await Chatbot.findOne({
       userId: getWorkspaceUserId(req.user),
     });
-    console.log(chatbot);
+    // console.log(chatbot);
     if (!chatbot) {
       return res.send({ success: false, message: "Chatbot not found" });
     }

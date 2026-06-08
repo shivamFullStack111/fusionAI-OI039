@@ -27,6 +27,12 @@ import {
 import If_logedin from "./components/protected-routes/If_logedin";
 import ChatbotUI from "./components/embed/ChatbotUI";
 import BotIdNotFound from "./components/embed/BotIdNotFound";
+import io from "socket.io-client";
+
+export const socket = io(DB_URL.replace("/api", ""),{
+  autoConnect:false
+});
+
 
 const App = () => {
   const dispatch = useDispatch();
@@ -77,7 +83,7 @@ const App = () => {
       console.log(error.message);
     } finally {
       clearAuthState();
-      navigate("/");
+      // navigate("/");
     }
   };
 
