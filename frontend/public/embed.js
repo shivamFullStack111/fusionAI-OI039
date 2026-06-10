@@ -20,8 +20,8 @@
 
   // bot id is required else show error
   if (botId) {
-    iframe.src = `http://localhost:5173/chatbot?user_id=${userId}&bot_id=${botId}`;
-    // iframe.src = `https://fusion-ai-zeta.vercel.app/chatbot?bot_id=${botId}`;
+    // iframe.src = `http://localhost:5173/chatbot?user_id=${userId}&bot_id=${botId}`;
+    iframe.src = `https://fusion-ai-zeta.vercel.app/chatbot?user_id=${userId}&bot_id=${botId}`;
 
     iframe.style.borderRadius = "50%";
     iframe.style.width = "55px";
@@ -29,7 +29,8 @@
   } else {
     iframe.style.width = "220px";
     iframe.style.height = "45px";
-    iframe.src = `http://localhost:5173/chatbot-id-not-found`;
+    // iframe.src = `http://localhost:5173/chatbot-id-not-found`;
+    iframe.src = `https://fusion-ai-zeta.vercel.app/chatbot-id-not-found`;
   }
 
   document.body.appendChild(iframe);
