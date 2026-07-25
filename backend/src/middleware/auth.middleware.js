@@ -6,6 +6,7 @@ import { getWorkspaceUserId } from "../utils/workspace.js";
 export const authMiddleware = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
+    console.log(req.headers.origin)
     const authToken = authHeader?.startsWith("Bearer ")
       ? authHeader.split(" ")[1]
       : authHeader;

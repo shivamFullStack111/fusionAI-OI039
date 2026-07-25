@@ -25,7 +25,7 @@ const app = express();
 
 connectDB();
 
-const origins = [process.env.FRONTEND_URL || "http://localhost:5173" ];
+const origins = [process.env.FRONTEND_URL || "http://localhost:5173"];
 
 const backend_URL = process.env.BACKEND_URL || "http://localhost:7474";
 
@@ -42,7 +42,7 @@ cron.schedule("*/8 * * * *", async () => {
 // middlewares
 app.use(
   cors({
-    origin: origins, // React ka exact URL
+    origin: true, // React ka exact URL
     credentials: true, // ← YEH ZAROORI HAI
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],

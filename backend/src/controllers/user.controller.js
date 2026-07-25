@@ -156,7 +156,7 @@ export const logout = (req, res) => {
 export const refreshToken = async (req, res) => {
   try {
     const currentRefreshToken = req.cookies.refreshToken;
-
+    console.log(req.headers.origin);
     if (!currentRefreshToken) {
       clearRefreshTokenCookie(res);
       return res
@@ -195,9 +195,7 @@ export const refreshToken = async (req, res) => {
 // checking in middleware
 export const isAuthenticated = async (req, res) => {
   try {
-    const user = await User.findOne({ _id: req.user?._id }).select(
-      "-password",
-    );
+    const user = await User.findOne({ _id: req.user?._id }).select("-password");
     return res.send({
       success: true,
       message: "user is authenticated",
