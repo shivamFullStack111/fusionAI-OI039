@@ -11,7 +11,7 @@ const Particle_screen = () => {
   const navigate = useNavigate();
   return (
     <div className="relative">
-      <div className="w-full  flex bg-transparent absolute  text-white z-50 mt-28 items-center flex-col ">
+      <div className="w-full px-4  flex bg-transparent absolute  text-white z-40 mt-28 items-center flex-col ">
         <Card
           className={
             "flex mb-8 gap-3 items-center justify-center flex-row p-2 px-3 "
@@ -20,16 +20,16 @@ const Particle_screen = () => {
           <p className="bg-green-500 h-2 w-2 rounded-full"></p>
           <p className="text-xs text-white/60 ">Version 1.0.0 available now</p>
         </Card>
-        <h1 className="text-6xl">Human-friendly support,</h1>
-        <h3 className="text-5xl mt-4 text-zinc-500">Powered by AI</h3>
-        <p className="mt-6 text-lg text-white/60">
+        <h1 className="text-2xl md:text-4xl lg:text-6xl">Human-friendly support,</h1>
+        <h3 className="text-3xl md:text-4xl lg:text-5xl mt-2 md:mt-3 lg:mt-4 text-zinc-500">Powered by AI</h3>
+        <p className="mt-2 text-xs md:text-base lg:text-lg text-center md:mt-4 lg:mt-6  text-white/60">
           Instantly resolve customer with an assistant that reads your
         </p>
-        <p className=" text-lg text-white/60">
+        <p className=" mt-2 text-xs md:text-base lg:text-lg text-center md:mt-4 lg:mt-6  text-white/60">
           docs and speaks with empathy. No robotic replies, just answers.
         </p>
 
-        <div className="flex mt-8 justify-center items-center gap-6 ">
+        <div className="flex mt-8 flex-col md:flex-row justify-center items-center gap-6 ">
           {isAuthenticated && (
             <Button
               onClick={() => {

@@ -40,25 +40,23 @@ const Pricing = ({ showCopyButton = false }) => {
 
   return (
     <ResponsiveContainer>
-      <div id="pricing" className="py-20">
-        <p className="text-4xl text-center ">
+      <div id="pricing" className="px-5 mt-10 md:mt-25 lg:mt-40">
+        <p className="text-lg md:text-2xl  max-md:text-centerlg:text-4xl  ">
           Plans That Grow With Your Business{" "}
         </p>
 
-        <p className="text-zinc-700 text-center mt-4 text-lg">
+        <p className="text-zinc-700 mt-4 text-lg">
           Choose a plan that fits your needs. Start for free and{" "}
         </p>
-        <p className="text-zinc-700 text-center  text-lg">
+        <p className="text-zinc-700  text-lg">
           upgrade anytime as your chatbot grows.{" "}
         </p>
 
-        <div className=" flex justify-evenly pt-10 ">
+        <div className="grid gap-6 pt-10 sm:grid-cols-2 lg:grid-cols-3">
           {allPlan.length > 0 &&
             allPlan?.map((p, index) => {
               return (
-                <div
-                  className={`bg-zinc-950  mt-10 relative flex flex-col w-70 h-100  border rounded-lg border-zinc-900 p-8`}
-                >
+                <div className="bg-zinc-950 relative flex min-h-[24rem] flex-col rounded-lg border border-zinc-900 p-6 sm:p-8">
                   {p.planType == "popular" && (
                     <div className="absolute bg-zinc-800 top-0 right-0 px-4 p-1 text-sm rounded-bl-lg rounded-tr-lg">
                       Popular{" "}
@@ -127,6 +125,8 @@ const Pricing = ({ showCopyButton = false }) => {
             })}
         </div>
       </div>
+      <br />
+      <br />
     </ResponsiveContainer>
   );
 };
