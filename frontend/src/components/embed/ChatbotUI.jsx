@@ -19,6 +19,7 @@ import { DB_URL } from "../../../utils/variables.js";
 import Loader from "../common/Loader";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
+import { Remark } from "react-remark";
 
 console.log("ChatbotUI FILE LOADED");
 
@@ -345,11 +346,8 @@ const ChatWindow = ({
     setTimeout(() => setVisibleMessages(newIds), 50);
   }, [messages]);
 
-
-
-
-    const chatContainerRef = useRef(null);
-    useEffect(() => {
+  const chatContainerRef = useRef(null);
+  useEffect(() => {
     const container = chatContainerRef.current;
 
     if (container) {
@@ -431,7 +429,10 @@ const ChatWindow = ({
       </div>
 
       {/* Messages */}
-      <div ref={chatContainerRef} className="flex-1 scroll-smooth overflow-y-auto px-4 py-4 flex flex-col gap-3 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10">
+      <div
+        ref={chatContainerRef}
+        className="flex-1 scroll-smooth overflow-y-auto px-4 py-4 flex flex-col gap-3 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10"
+      >
         {messages && messages?.length === 0 && (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
@@ -933,7 +934,7 @@ const MessageBubble = ({
             }`}
             style={!isAi ? { backgroundColor: primaryColor } : {}}
           >
-            {text}
+            <Remark>{text}</Remark>
           </div>
           {!isAi && (
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center shrink-0">
