@@ -51,6 +51,7 @@
         height: "55px",
         borderRadius: "100px",
         border: "1px solid black",
+        overflow:"hidden"
       });
     }
   });
