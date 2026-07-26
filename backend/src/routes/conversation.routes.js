@@ -17,7 +17,7 @@ conversationRoutes.post(
   authMiddleware,
   getAllConversations,
 );
-conversationRoutes.post("/submit-review", authMiddleware, submitReview);
+conversationRoutes.post("/submit-review", submitReview);
 conversationRoutes.post("/get-external-user-all-conversations", getExternalUserAllConversations);
 conversationRoutes.post("/get-external-user-all-conversations", getExternalUserAllConversations);
 conversationRoutes.post("/resolve-ticket",authMiddleware ,resolveTicketConversation);

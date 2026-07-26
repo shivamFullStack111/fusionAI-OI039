@@ -269,11 +269,11 @@ const ChatbotUI = () => {
 const ChatButton = ({ onClick, primaryColor }) => (
   <button
     onClick={onClick}
-    className="group flex cursor-pointer   w-[55px] h-[55px] items-center justify-center rounded-full shadow-lg  transition-all duration-300"
+    className="group flex cursor-pointer    w-[55px] h-[55px] items-center justify-center rounded-full shadow-lg  transition-all duration-300"
     style={{ backgroundColor: primaryColor }}
   >
     <MessageCircle size={24} className="text-white" />
-    <div className="absolute inset-0 rounded-full bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+    <div className="absolute inset-0 rounded-full  bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
   </button>
 );
 
