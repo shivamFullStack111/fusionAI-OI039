@@ -17,6 +17,7 @@ import toast from "react-hot-toast";
 import { DB_URL } from "../../../utils/variables.js";
 import { useSelector } from "react-redux";
 import { socket } from "@/App.jsx";
+import { Remark } from "react-remark";
 
 const Conversations = () => {
   const [allConversations, setAllConversations] = useState([]);
@@ -202,7 +203,7 @@ const Conversations = () => {
       socket.emit("send-message-by-support", {
         message: messageToSend,
         conversationId: selectedConversation?._id,
-        receiverId:selectedConversation?.externaluserId
+        receiverId: selectedConversation?.externaluserId,
       });
 
       const accessToken = Cookies.get("accessToken");
@@ -247,9 +248,9 @@ const Conversations = () => {
 
   return (
     <DashboardLayout>
-      <div className="flex w-full h-screen">
+      <div className="p-4 md:p-6 py-8 lg:p-8 flex flex-col lg:flex-row w-full h-screen">
         {/* LEFT SIDEBAR - Conversations List */}
-        <div className="w-[30%] border-r flex flex-col h-full">
+        <div className="w-full lg:w-[30%] border-r flex flex-col h-full">
           <div className="p-4 border-b">
             <div className="flex justify-between items-center">
               <p className="font-semibold text-zinc-300">Inbox</p>
@@ -321,7 +322,7 @@ const Conversations = () => {
         </div>
 
         {/* RIGHT CHAT AREA */}
-        <div className="flex-1 flex flex-col h-full">
+        <div className="flex-1 mt-20 flex flex-col h-full">
           {/* Chat Header */}
           <div className="border-b p-4 bg-zinc-950/50">
             <div className="flex justify-between items-center">
@@ -366,7 +367,7 @@ const Conversations = () => {
           </div>
 
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          <div className="flex-1 overflow-y-auto p-1 py-4 md:p-2 lg:p-4 space-y-3">
             {loadingMessages ? (
               <div className="text-center text-zinc-500 py-8">
                 Loading messages...
@@ -462,7 +463,7 @@ const MessageBubble = ({ message }) => {
         }`}
       >
         <p className="whitespace-pre-wrap wrap-break-words">
-          {message.content}
+          <Remark>{message.content}</Remark>
         </p>
         <p
           className={`text-[10px] mt-1 ${isAi ? "text-zinc-600" : "text-blue-200/70"}`}

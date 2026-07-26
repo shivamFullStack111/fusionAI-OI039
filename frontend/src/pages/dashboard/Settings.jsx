@@ -38,7 +38,7 @@ const Settings = () => {
   const navigate = useNavigate();
   return (
     <DashboardLayout>
-      <div className="p-8 w-full">
+      <div className="p-4 md:p-6 py-8 lg:p-8  w-full">
         {/* header  */}
         <div className="flex justify-between items-center ">
           <div>
@@ -153,7 +153,7 @@ const WorkspaceSettings = () => {
           Configure general settings for your organization
         </p>
 
-        <div className="mt-6 grid gap-4 grid-cols-2">
+        <div className="mt-6 grid gap-4 grid-cols-1 md:grid-cols-2">
           <div>
             <FieldLabel className={"text-zinc-400"} htmlFor="workspace-name">
               Workspace Name
@@ -312,8 +312,8 @@ const TeamMembers = () => {
   return (
     <>
       <div className="rounded-lg mt-5 bg-zinc-950 p-4">
-        <div className="flex justify-between items-center">
-          <div>
+        <div className="flex flex-col md:flex-row justify-between items-center">
+          <div className="w-full">
             <p className="text-zinc-300 text-lg font-medium">Team Members</p>
 
             <p className="text-sm text-zinc-600">
@@ -321,12 +321,14 @@ const TeamMembers = () => {
             </p>
           </div>
 
-          {!isMember && (
+          <div className="ml-auto">
+            {!isMember && (
             <AddUserDialog
               setAllMembers={setAllMembers}
               allMembers={allMembers}
             />
           )}
+          </div>
         </div>
 
         {/* Loading Skeleton */}

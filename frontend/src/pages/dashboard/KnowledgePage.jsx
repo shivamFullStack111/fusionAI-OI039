@@ -79,7 +79,7 @@ const KnowledgePage = () => {
 
   return (
     <DashboardLayout>
-      <div className="p-8 w-full">
+      <div className="p-4 md:p-6 py-8 lg:p-8 w-full">
         {/* drawer  */}
         <AddKnowledgeModal
           allKnowledges={allKnowledges}
@@ -88,8 +88,8 @@ const KnowledgePage = () => {
           setopen={setaddKnowledgeOpen}
         />
         {/* header  */}
-        <div className="flex justify-between items-center ">
-          <div>
+        <div className="flex w-full flex-col md:flex-row justify-between items-center ">
+          <div className="w-full">
             <h5 className="text-xl ">Knowledge Base</h5>
             <p className="text-sm mt-1 text-zinc-600">
               Manage your website sources, documents,and uploads.{" "}
@@ -99,7 +99,7 @@ const KnowledgePage = () => {
           {/* <RightDrawer /> */}
           <Button
             onClick={() => setaddKnowledgeOpen(true)}
-            className={"cursorpo"}
+            className={"cursorpo max-md:mt-3 ml-auto"}
           >
             <Plus />
             Add Knowledge
@@ -107,7 +107,7 @@ const KnowledgePage = () => {
         </div>
 
         {/* 3 boxes of add sources types */}
-        <div className="grid grid-cols-3 gap-5 mt-7">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-7">
           <div
             onClick={() => setaddKnowledgeOpen(true)}
             className="p-5 cursor-pointer hover:border-blue-600 py-8  bg-zinc-950 border rounded-lg "
@@ -122,8 +122,7 @@ const KnowledgePage = () => {
               Add Website
             </p>
             <p className="text-xs mt-2 text-zinc-600 text-center">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Officia,
-              fugiat! Lorem, ipsum dolor.
+              Extract and index knowledge directly from any public website.
             </p>
           </div>
           <div
@@ -140,8 +139,7 @@ const KnowledgePage = () => {
               Upload File
             </p>
             <p className="text-xs mt-2 text-zinc-600 text-center">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Officia,
-              fugiat! Lorem, ipsum dolor.
+              Upload documents to build an accurate AI knowledge base.
             </p>
           </div>
           <div
@@ -158,8 +156,7 @@ const KnowledgePage = () => {
               Manual Text
             </p>
             <p className="text-xs mt-2 text-zinc-600 text-center">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Officia,
-              fugiat! Lorem, ipsum dolor.
+              Paste custom text to instantly create searchable AI knowledge.
             </p>
           </div>
         </div>
@@ -238,10 +235,11 @@ const KnowledgeTableList = ({
                         <FileText size={18} className="text-blue-700" />
                         <div>
                           <p className="text-xs capitalize text-zinc-300">
-                            {knowledge?.text?.title}
+                            {knowledge?.text?.title?.slice(0, 30)}
+                            {knowledge?.text?.title.length > 30 && "..."}
                           </p>
                           <p className="text-[11px] text-zinc-600">
-                            {knowledge?.text?.content?.slice(0, 20) + "..."}
+                            {knowledge?.text?.content?.slice(0, 40) + "..."}
                           </p>
                         </div>
                       </div>
@@ -306,7 +304,9 @@ const KnowledgeTableList = ({
           <TableBody>
             <TableRow>
               <TableCell colSpan={5} className="text-center py-10">
-                <div className="text-zinc-500">No knowledge found. Add a new one.</div>
+                <div className="text-zinc-500">
+                  No knowledge found. Add a new one.
+                </div>
               </TableCell>
             </TableRow>
           </TableBody>

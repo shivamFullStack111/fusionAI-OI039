@@ -139,7 +139,7 @@ const KnowledgeBase = ({ knowledges }) => {
         </Link>
       </div>
 
-      <div className="grid gap-4 grid-cols-3 mt-3">
+      <div className="grid gap-4 grid-cols-1 md:flex-cols-3 mt-3">
         <CardItem icon={<Globe size={15} />} title="Pages" value={pages} />
         <CardItem
           icon={<Text size={15} />}
@@ -192,7 +192,7 @@ const Sections = ({ sections, navigate }) => {
               key={sec._id}
               className="p-3 flex items-center justify-between border rounded-lg bg-zinc-900 text-sm"
             >
-              <p> {sec?.sectionName}</p>
+              <p> {sec?.sectionName?.slice(0,30)}{sec?.sectionName?.length>30&&"..."}</p>
               <Link to={`/dashboard/sections`}>
                 <Button variant="outline" size="xs">
                   View

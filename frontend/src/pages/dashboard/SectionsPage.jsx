@@ -45,7 +45,7 @@ const SectionPage = () => {
 
   return (
     <DashboardLayout>
-      <div className="p-8 w-full">
+      <div className="p-4 md:p-6 py-8 lg:p-8 w-full">
         <div className="flex justify-between items-center">
           <div>
             <h5 className="text-xl">Sections</h5>
@@ -82,7 +82,10 @@ const SectionPage = () => {
               <TableBody key={section?._id}>
                 <TableRow>
                   <TableCell>
-                    <p className="text-zinc-400">{section?.sectionName}</p>
+                    <p className="text-zinc-400">
+                      {section?.sectionName?.slice(0, 30)}
+                      {section?.sectionName.length > 30 && "..."}
+                    </p>
                   </TableCell>
                   <TableCell>
                     <div className="text-sm text-zinc-600">
@@ -128,7 +131,7 @@ const SectionPage = () => {
             {isLoadingSections && <SkeletonList totalCell={7} />}
 
             {!isLoadingSections && allSections?.length === 0 && (
-              <TableBody >
+              <TableBody>
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-10">
                     <div className="text-zinc-500">

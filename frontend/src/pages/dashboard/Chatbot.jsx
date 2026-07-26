@@ -73,7 +73,7 @@ const Chatbot = () => {
 
   return (
     <DashboardLayout>
-      <div className="p-8 w-full">
+      <div className="p-4 md:p-6 py-8 lg:p-8 w-full">
         {/* header  */}
         <div className="flex justify-between items-center ">
           <div>
@@ -84,11 +84,11 @@ const Chatbot = () => {
           </div>
         </div>
 
-        <div className="flex mt-7 gap-5 ">
-          <div className="w-[60%]  ">
+        <div className="flex flex-col lg:flex-row mt-7 gap-5 ">
+          <div className="w-full lg:w-[60%]  ">
             <Chatbot_playground welcomeMessage={welcomeMessage}  primaryColorr={primaryColor}/>
           </div>
-          <div className="w-[40%] h-min ">
+          <div className="lg:w-[40%] h-min ">
             <Apperance_Box
               loading={loading}
               setloading={setloading}
