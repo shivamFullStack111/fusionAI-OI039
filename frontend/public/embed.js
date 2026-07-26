@@ -35,24 +35,39 @@
 
   document.body.appendChild(iframe);
 
+  function openWidget() {
+    const isMobile = window.innerWidth <= 768;
+
+    Object.assign(iframe.style, {
+      width: isMobile ? "95vw" : "500px",
+      height: isMobile ? "600px" : "600px",
+      right: isMobile ? "2.5vw" : "20px",
+      bottom: "20px",
+      borderRadius: isMobile ? "12px" : "15px",
+      border: "0",
+    });
+  }
+
+  function closeWidget() {
+    Object.assign(iframe.style, {
+      width: "55px",
+      height: "55px",
+      borderRadius: "50%",
+      border: "1px solid black",
+      overflow: "hidden",
+      right: "20px",
+      bottom: "20px",
+    });
+  }
+
   window.addEventListener("message", (e) => {
     if (e.data == "widget:open") {
-      Object.assign(iframe.style, {
-        width: "500px",
-        height: "600px",
-        borderRadius: "15px",
-        border: "0px solid black",
-      });
+      openWidget();
+
       // console.log("hbfhvbfhvbhfb");
     }
     if (e.data == "widget:close") {
-      Object.assign(iframe.style, {
-        width: "55px",
-        height: "55px",
-        borderRadius: "100px",
-        border: "1px solid black",
-        overflow:"hidden"
-      });
+      closeWidget();
     }
   });
 })();

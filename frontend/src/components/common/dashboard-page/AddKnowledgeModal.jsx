@@ -100,7 +100,7 @@ function AddKnowledgeModal({ open, setopen, allKnowledges, setallKnowledges }) {
   return (
     <Dialog open={open} onOpenChange={setopen}>
       <form>
-        <DialogContent className="sm:max-w-sm text-white p-6 min-w-130 bg-black ">
+        <DialogContent className="sm:max-w-sm text-white p-6 w-full md:min-w-130 bg-black ">
           <DialogHeader>
             <DialogTitle className={"text-zinc-300"}>
               Add New Sources

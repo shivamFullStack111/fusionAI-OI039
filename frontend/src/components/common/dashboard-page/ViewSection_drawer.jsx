@@ -182,7 +182,7 @@ function ViewSection_drawer({
           <Eye size={20} />
         </div>
       </DrawerTrigger>
-      <DrawerContent className="bg-black! min-w-110 border-gray-950">
+      <DrawerContent className="bg-black! max-sm:min-w-[90%] md:min-w-110 border-gray-950">
         <DrawerHeader className={"border-b border-zinc-900"}>
           <DrawerTitle className="text-zinc-100">View Section</DrawerTitle>
           <DrawerDescription className="text-zinc-500">
