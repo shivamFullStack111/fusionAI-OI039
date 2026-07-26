@@ -55,16 +55,16 @@ const Dashboard_homePage = () => {
 
   return (
     <DashboardLayout>
-      <div className="p-8 w-full">
+      <div className="p-4 md:p-6 py-8 lg:p-8 w-full">
         <SetupProgress knowledges={knowledges} sections={sections} />
 
-        <div className="flex gap-5 mt-5">
-          <div className="flex w-[60%] flex-col gap-5">
+        <div className="flex flex-col lg:flex-row gap-5 mt-5">
+          <div className="flex w-full lg:w-[60%] flex-col gap-5">
             <KnowledgeBase knowledges={knowledges} />
             <Sections sections={sections} navigate={navigate} />
           </div>
 
-          <div className="flex w-[40%] flex-col gap-5">
+          <div className="flex w-full lg:w-[40%] flex-col gap-5">
             <RecentChats recent5Conversations={recent5Conversations} />
             <InstallWidget />
           </div>
@@ -84,7 +84,7 @@ const SetupProgress = ({ knowledges, sections }) => {
     <div className="w-full">
       <h5 className="text-xl ">Setup Progress</h5>
 
-      <div className="grid-cols-3 w-full grid gap-5 mt-6">
+      <div className="grid-cols-1 md:grid-cols-3 w-full grid gap-5 mt-6">
         {/* Knowledge */}
         <div className="flex w-full rounded-lg border bg-zinc-950 p-5 justify-between items-center">
           <p className="text-sm">Knowledge Added</p>
@@ -164,7 +164,7 @@ const CardItem = ({ icon, title, value }) => (
 
 const Sections = ({ sections, navigate }) => {
   return (
-    <div className="p-4 min-h-80 w-full border rounded-lg">
+    <div className="p-4 min-h-60 w-full border rounded-lg">
       <div className="flex justify-between">
         <div>
           <p>Sections</p>
